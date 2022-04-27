@@ -1,0 +1,2 @@
+nc irc.libera.chat 6667 <connection_settings <&1
+nc -c localhost 555

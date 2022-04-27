@@ -6,12 +6,18 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/04/22 17:58:19 by mservage         ###   ########.fr       */
+/*   Updated: 2022/04/25 17:21:30 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <string>
 #include <iostream>
+
+/* user contient:
+	sa socket
+	son nom
+	son password
+	*/
 
 class User
 {

@@ -6,10 +6,12 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:24:21 by matthieu          #+#    #+#             */
-/*   Updated: 2022/04/28 17:38:57 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/04/29 15:02:39 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include "Server.hpp"
 
 Server::Server()
@@ -57,6 +59,12 @@ std::string	Server::getServerName(void) const
 
 void	Server::addNewUser(std::string name, std::string password)
 {
+	sockaddr_in	address;
+	
 	_users.push_back(User(name, password));
-	_fds.push_back(_users[_users.size()].getFd());
+	_fds.push_back(_users[_users.size() - 1].getPollFd());
+	address.sin_family = AF_INET;
+	address.sin_port = htons(6666); //port de notre serveur
+	address.sin_addr.s_addr = INADDR_ANY;
+	bind(_fds[_fds.size() - 1].fd, (struct sockaddr *)&address, sizeof(address));
 }

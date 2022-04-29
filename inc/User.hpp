@@ -6,12 +6,14 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/04/28 19:04:34 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/04/29 13:52:47 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <string>
 #include <iostream>
+#include <sys/socket.h>
+#include <poll.h>
 
 /* user contient:
 	son nom
@@ -24,7 +26,8 @@ class User
 private:
 	std::string	_name;
 	std::string	_password;
-	int			_fd;
+	pollfd		_poll_fd;
+	bool		_isAuthentified;
 public:
 	User();
 	User(std::string name, std::string password);
@@ -32,7 +35,7 @@ public:
 
 	~User();
 	User	&operator=(User const &rhs);
-	int	getFd(void) const;
+	pollfd	getPollFd(void) const;
 	std::string	getName(void) const;
 	void	setName(std::string name);
 	std::string	getPassword(void) const;

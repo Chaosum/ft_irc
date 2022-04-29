@@ -6,12 +6,13 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/04/28 17:44:03 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/04/29 13:57:38 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <vector>
 #include <poll.h>
+#include <sys/socket.h>
 #include "User.hpp"
 #include "Channel.hpp"
 
@@ -29,7 +30,7 @@ private:
 
 	std::vector<Channel>	_channels;
 	std::vector<User>		_users;
-	std::vector<int>		_fds;
+	std::vector<pollfd>		_fds;
 
 public:
 	Server();

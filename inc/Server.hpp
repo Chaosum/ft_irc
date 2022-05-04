@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/04/29 13:57:38 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/05/04 11:26:20 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,6 @@ public:
 	Server	&operator=(Server const &rhs);
 	int	getPort(void) const;
 	std::string	getServerName(void) const;
+	std::vector<pollfd> getFds();
 	void	addNewUser(std::string name, std::string password);
 };

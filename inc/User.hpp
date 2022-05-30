@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/04/29 13:52:47 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/05/20 16:45:07 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ private:
 	std::string	_password;
 	pollfd		_poll_fd;
 	bool		_isAuthentified;
+	bool		_isOp;
 public:
 	User();
 	User(std::string name, std::string password);

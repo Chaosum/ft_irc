@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/05/30 18:29:32 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/06/07 17:01:11 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ public:
 	pollfd	getPollFd(void) const;
 	string	getName(void) const;
 	void	setName(string name);
+	string	getNick(void) const;
+	void	setNick(string nick);
 	string	getPassword(void) const;
 	void	setPassword(string password);
 };

@@ -6,13 +6,13 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:24:21 by matthieu          #+#    #+#             */
-/*   Updated: 2022/05/04 11:26:39 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/06/07 22:02:32 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include "Server.hpp"
+#include "../inc/Server.hpp"
 
 Server::Server()
 {
@@ -69,3 +69,4 @@ void	Server::addNewUser(std::string name, std::string password)
 	_users.push_back(User(name, password));
 	_fds.push_back(_users[_users.size() - 1].getPollFd());
 }
+

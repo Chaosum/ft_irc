@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/05/30 18:44:40 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/06/07 22:09:14 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,20 @@ using namespace std;
 class Server
 {
 private:
-	string		_server_name;
+	string			_server_name;
 	int				_port;
 
 	vector<Channel>	_channels;
-	vector<User>		_users;
-	vector<pollfd>		_fds;
+	vector<User>	_users;
+	vector<pollfd>	_fds;
 
+	string _composePrefix(User * sender);
+	string _sendPrivmsgToChan(User * sender, string channel, string text);
+	string _sendPrivmsgToUser(User * sender, string recipient, string text);
 	// Server commands
 	string pass(User * user, string password);
 	string nick(User * user, string nickname);
 	string user(User * user, string username, string hostname, string servername, string realname);
-	// oper command ?
 	void quit(User * user, string msg);
 	string join(User * user, vector<string> & requested_channels, vector<string> & passwords);
 	string part(User * user, vector<string> & channels);
@@ -48,7 +50,7 @@ private:
 	string list(User * user, vector<string> & channels);
 	string invite(User * user, string nick, string channel);
 	string kick(User * user, string channel, string kickee, string comment);
-	string privmsg(User * user, vector<string> & recipients, string msg);
+	void privmsg(User * user, vector<string> & recipients, string msg);
 	void notice(User * user, string recipient, string msg);
 
 public:

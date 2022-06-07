@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/05/30 18:29:46 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/06/07 21:52:28 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,9 @@ public:
 
 	string getName();
 	string getTopic();
+	const vector<User*> getMembers();
 	bool verifyPassword(string password);
+	bool canUserMessageChannel(User * user); // see ERR_CANNOTSENDTOCHAN (404)
 	// Returns true on successful change
 	bool setPassword(User const * user, string newPasswd);
 	bool setPrivate(User const * user, bool value);

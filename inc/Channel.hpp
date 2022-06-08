@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/06/07 21:52:28 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/06/08 16:45:54 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,18 +23,16 @@ class Channel
 {
 private:
 	string			_name;
-	string			_password;
 	string			_topic;
 	vector<User*>	_members;
 	vector<User*>	_ops;
-	vector<User*>	_invited;
 	vector<User*>	_banned;
 	vector<User*>	_muted;
 	size_t			_maxNbOfUsers;
-	bool				_isPrivate;
-	bool				_isSecret;
-	bool				_inviteOnly;
-	bool				_topicSettableOnlyByOp;
+	bool			_isPrivate;
+	bool			_isSecret;
+	bool			_inviteOnly;
+	bool			_topicSettableOnlyByOp;
 
 	Channel();
 	Channel(Channel const &src);

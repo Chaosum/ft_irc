@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/06/07 22:20:39 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/06/08 16:45:54 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,6 @@ string Server::mode(User * user, string requested_channel, vector<string> & oper
 string Server::topic(User * user, string channel, string topic) {
 }
 string Server::list(User * user, vector<string> & channels) {
-}
-string Server::invite(User * user, string nick, string channel) {
 }
 string Server::kick(User * user, string channel, string kickee, string comment) {
 }

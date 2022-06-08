@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/06/07 17:01:11 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/06/08 16:45:54 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,8 @@ class User
 private:
 	string	_name;
 	string	_nick;
-	string	_password;
-	pollfd		_poll_fd;
-	bool		_isAuthentified;
-	bool		_isOp;
+	pollfd	_poll_fd;
+	bool	_isOp;
 public:
 	User();
 	User(string name, string password);
@@ -46,6 +44,4 @@ public:
 	void	setName(string name);
 	string	getNick(void) const;
 	void	setNick(string nick);
-	string	getPassword(void) const;
-	void	setPassword(string password);
 };

@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/06/07 22:09:14 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/06/08 16:45:28 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ class Server
 {
 private:
 	string			_server_name;
+	string			_password;
 	int				_port;
 
 	vector<Channel>	_channels;

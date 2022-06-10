@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/06/08 16:45:28 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/06/10 14:29:35 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ private:
 	string mode(User * user, string requested_channel, vector<string> & operands);
 	string topic(User * user, string channel, string topic);
 	string list(User * user, vector<string> & channels);
-	string invite(User * user, string nick, string channel);
 	string kick(User * user, string channel, string kickee, string comment);
 	void privmsg(User * user, vector<string> & recipients, string msg);
 	void notice(User * user, string recipient, string msg);

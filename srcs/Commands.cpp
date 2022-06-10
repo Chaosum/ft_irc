@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/06/08 16:45:54 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/06/10 15:53:27 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 string Server::_composePrefix(User * sender) {
 	string res = "";
 
+	if (sender == NULL)
+		return _server_name + " ";
 	res.append(":" + sender->getNick() + "!" + sender->getName());
 	res.append("@" + _server_name + " ");
 	return res;
@@ -22,7 +24,7 @@ string Server::_composePrefix(User * sender) {
 
 string Server::_sendPrivmsgToChan(User * sender, string channel, string text) {
 	vector<Channel>::iterator chan;
-		vector<User*>::const_iterator it;
+	vector<User*>::const_iterator it;
 	for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 		if (chan->getName() == channel)
 			break;
@@ -54,7 +56,16 @@ string Server::nick(User * user, string nickname) {
 string Server::user(User * user, string username, string hostname, string servername, string realname) {
 }
 void Server::quit(User * user, string msg) {
+	vector<Channel>::iterator chan;
+
+	msg = msg == ""? user->getNick() + " is quitting the server" : msg;
+	for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
+		if (chan->isUserInChannel(user)) {
+			notice(user, chan->getName(), msg);
+			chan->deleteUserFromChannel(user);
+		}
 }
+
 string Server::join(User * user, vector<string> & requested_channels, vector<string> & passwords) {
 }
 string Server::part(User * user, vector<string> & channels) {
@@ -62,8 +73,6 @@ string Server::part(User * user, vector<string> & channels) {
 string Server::mode(User * user, string requested_channel, vector<string> & operands) {
 }
 string Server::topic(User * user, string channel, string topic) {
-}
-string Server::list(User * user, vector<string> & channels) {
 }
 string Server::kick(User * user, string channel, string kickee, string comment) {
 }
@@ -91,10 +100,22 @@ void Server::privmsg(User * user, vector<string> & recipients, string msg) {
 
 void Server::notice(User * user, string recipient, string msg) {
 	vector<User>::iterator it;
-	for (it = _users.begin() ; it != _users.end() ; ++it) {
-		if (it->getNick() == recipient) {
-			_send_txt(it->getPollFd(), _composePrefix(user) + "NOTICE " + recipient + " :" + msg);
-			break;
+	vector<User*>::const_iterator chan_user;
+	vector<Channel>::iterator chan;
+
+	if (recipient[0] == '#' || recipient[0] == '&') { // Case where the recipient is a channel
+		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
+			if (chan->getName() == recipient)
+				break;
+		for (chan_user = chan->getMembers().begin() ; chan_user != chan->getMembers().end() ; ++chan_user) {
+			_send_txt((*chan_user)->getPollFd(), _composePrefix(user) + "NOTICE " + (*chan_user)->getNick() + " :" + msg);
 		}
 	}
+	else
+		for (it = _users.begin() ; it != _users.end() ; ++it) {
+			if (it->getNick() == recipient) {
+				_send_txt(it->getPollFd(), _composePrefix(user) + "NOTICE " + recipient + " :" + msg);
+				break;
+			}
+		}
 }

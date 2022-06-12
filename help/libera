@@ -1,2 +1,7 @@
 nc irc.libera.chat 6667 <connection_settings <&1
 nc -c localhost 555
+
+
+/server add name localhost/port
+
+/connect name -pwd=mdp

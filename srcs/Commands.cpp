@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/06/10 15:53:27 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/06/10 17:21:54 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ string Server::_composePrefix(User * sender) {
 	string res = "";
 
 	if (sender == NULL)
-		return _server_name + " ";
+		return ":" + _server_name + " ";
 	res.append(":" + sender->getNick() + "!" + sender->getName());
 	res.append("@" + _server_name + " ");
 	return res;
@@ -66,8 +66,31 @@ void Server::quit(User * user, string msg) {
 		}
 }
 
-string Server::join(User * user, vector<string> & requested_channels, vector<string> & passwords) {
+string Server::join(User * user, vector<string> & requested_channels) {
+	vector<Channel>::iterator chan;
+	vector<string>::iterator it;
+	string topic;
+
+	if (requested_channels.empty())
+		_send_txt(user->getPollFd(), ":" + _server_name + " 461 JOIN :Not enough parameters");
+	for (it = requested_channels.begin() ; it != requested_channels.end() ; ++it) {
+		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
+			if (chan->getName() == *it)
+				break;
+		if (chan != _channels.end()) {
+			chan->addUser(user);
+			topic = chan->getTopic();
+			if (topic == "")
+				_send_txt(user->getPollFd(), _composePrefix(NULL) + "331 " + chan->getName() + " :No topic is set");
+			else
+				_send_txt(user->getPollFd(), _composePrefix(NULL) + "332 " + chan->getName() + " :" + topic);
+		}
+		else {
+		// create channel
+		}
+	}
 }
+
 string Server::part(User * user, vector<string> & channels) {
 }
 string Server::mode(User * user, string requested_channel, vector<string> & operands) {

@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/06/10 17:21:54 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/06/20 13:51:32 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,8 +95,32 @@ string Server::part(User * user, vector<string> & channels) {
 }
 string Server::mode(User * user, string requested_channel, vector<string> & operands) {
 }
-string Server::topic(User * user, string channel, string topic) {
+void Server::topic(User * user, string channel, string topic) {
+	if (channel.empty()) {
+		_send_txt(user->getPollFd(), _composePrefix(NULL) + "461 TOPIC :Not enough parameters");
+		return ;
+	}
+	vector<Channel>::iterator it;
+	for (it = _channels.begin() ; it != _channels.end() ; ++it) {
+		if (it->getName() == channel)
+			break ;
+	}
+	if (it == _channels.end() || !it->isUserInChannel(user)) {
+		_send_txt(user->getPollFd(), _composePrefix(NULL) + "442 " + channel + " :You're not on that channel");
+		return;
+	}
+	if (topic.empty()) {
+		if (it->getTopic().empty())
+			_send_txt(user->getPollFd(), _composePrefix(NULL) + "331 " + channel + " :No topic is set");
+		else
+			_send_txt(user->getPollFd(), _composePrefix(NULL) + "332 " + channel + " :" + it->getTopic()); 
+	}
+	else if (it->setTopic(user, topic))
+		_send_txt(user->getPollFd(), _composePrefix(NULL) + "332 " + channel + " :" + it->getTopic());
+	else
+		_send_txt(user->getPollFd(), _composePrefix(NULL) + "482 " + channel + " :You're not channel operator");
 }
+
 string Server::kick(User * user, string channel, string kickee, string comment) {
 }
 

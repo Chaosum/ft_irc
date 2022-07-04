@@ -6,11 +6,11 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:25:32 by matthieu          #+#    #+#             */
-/*   Updated: 2022/05/13 13:51:33 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/04 15:37:53 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Channel.hpp"
+#include "../inc/Channel.hpp"
 
 Channel::Channel()
 {

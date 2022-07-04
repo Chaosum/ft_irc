@@ -5,23 +5,16 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-<<<<<<< HEAD
-/*   Created: 2022/06/03 13:28:47 by matthieu          #+#    #+#             */
-/*   Updated: 2022/06/12 17:32:00 by matthieu         ###   ########.fr       */
-=======
-/*   Created: 2022/04/28 11:24:21 by matthieu          #+#    #+#             */
-/*   Updated: 2022/06/07 22:02:32 by lgaudet-         ###   ########.fr       */
->>>>>>> origin/leto
+/*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
+/*   Updated: 2022/07/04 17:35:20 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <netinet/in.h>
-<<<<<<< HEAD
 #include <unistd.h>
-#include "Server.hpp"
-=======
 #include "../inc/Server.hpp"
->>>>>>> origin/leto
+
+#define MAXUSER 666
 
 Server::Server()
 {
@@ -31,10 +24,10 @@ Server::Server(Server const &src)
 {
 	this->_server_name = src._server_name;
 	this->_port = src._port;
-	this->_serv_password = src._serv_password;
+	this->_password = src._password;
 }
 
-Server::Server(std::string server_name, int port, char *password): _server_name(server_name), _port(port), _serv_password(password)
+Server::Server(std::string server_name, int port, char *password): _server_name(server_name), _port(port), _password(password)
 {
 	this->_addr_size = sizeof(_address);
 }
@@ -47,7 +40,7 @@ Server	&Server::operator=(Server const &rhs)
 {
 	this->_server_name = rhs._server_name;
 	this->_port = rhs._port;
-	this->_serv_password = rhs._serv_password;
+	this->_password = rhs._password;
 	return (*this);
 }
 
@@ -60,12 +53,6 @@ std::string	Server::getServerName(void) const
 {
 	return (this->_server_name);
 }
-
-std::string	Server::getServerPassword(void) const
-{
-	return (this->_serv_password);
-}
-
 
 std::vector<pollfd> Server::getFds()
 {
@@ -87,12 +74,12 @@ void	Server::init_listen()
 		std::cout << "Error, failed to bind" << std::endl;
 		exit(-1);
 	}
-	if (listen(poll_fd.fd, 666) < 0) // 666?
+	if (listen(poll_fd.fd, MAXUSER) < 0)
 	{
 		std::cout << "Error, failed to grab connection" << std::endl;
 		exit(-1);
 	}
-	_fds.push_back(poll_fd);
+	_fds.push_front(poll_fd);
 }
 
 void	Server::wait_for_event()
@@ -100,7 +87,7 @@ void	Server::wait_for_event()
 	int		ret = 0;
 	char	buf[4096];
 
-	while (1)
+	while (true)
 	{
 		ret = poll(&(_fds[0]), _fds.size(), 0);
 		if (ret < 0)
@@ -119,6 +106,7 @@ void	Server::wait_for_event()
 			newUser_pollfd.events = POLLIN|POLLOUT;
 			newUser_pollfd.revents = 0;
 			_fds.push_back(newUser_pollfd);
+			_users.push_back()
 		}
 		std::vector<pollfd>::iterator	it = _fds.begin();
 		it++;
@@ -131,13 +119,14 @@ void	Server::wait_for_event()
 				for (int i = 0; i < 4096; i++)
 					buf[i] = 0;
 				read_ret = read(it->fd, buf, 4096); //read the message
-				printf("%s", buf); 
+				printf("%s", buf);
 				msg_parse(buf);
 				if (read_ret == 0)
 				{
 					printf("fd = %d et revent = %d\n", it->fd, it->revents);
 					close(it->fd);
-					it = _fds.erase(it);
+					it = _fds.erase(it); 
+					quit(&_users[it - _users.begin()], "");
 					continue ;
 				}
 			}
@@ -151,6 +140,7 @@ void	Server::msg_parse(char *buf)
 {
 	int i = 0;
 	std::string line;
+	User tempUser();
 
 	while (buf[i])
 	{
@@ -159,15 +149,30 @@ void	Server::msg_parse(char *buf)
 			line = line + buf[i];
 			i++;
 		}
-		printf("line = %s\n", line.c_str());
-		if (line == "PASS")
-			;//fonction PASS
-		if (line == "NICK")
-			;//fonction NICK
-		if (line == "USER")
-			;//fonction USER
-		line.clear();
+		if (line.compare(0, 5, "PASS ") == 0)
+			printf("PASS\n");//fonction PASS
+		else if (line.compare(0, 5, "NICK ") == 0)
+			printf("NICK\n");//fonction NICK
+		else if (line.compare(0, 5, "USER ") == 0)
+			printf("USER\n");//fonction USER
+		else if (line.compare(0, 5, "QUIT ") == 0)
+			printf("QUIT\n");//fonction QUIT
+		else if (line.compare(0, 5, "JOIN ") == 0)
+			printf("JOIN\n");//fonction JOIN
+		else if (line.compare(0, 5, "PART ") == 0)
+			printf("PART\n");//fonction PART
+		else if (line.compare(0, 5, "MODE ") == 0)
+			printf("MODE\n");//fonction MODE
+		else if (line.compare(0, 6, "TOPIC ") == 0)
+			printf("TOPIC\n");//fonction TOPIC
+		else if (line.compare(0, 5, "LIST ") == 0)
+			printf("LIST\n");//fonction LIST
+		else if (line.compare(0, 5, "KICK ") == 0)
+			printf("KICK\n");//fonction KICK
+		else if (line.compare(0, 8, "PRIVMSG ") == 0)
+			printf("PRIVMSG\n");//fonction PRIVMSG
 		i++;
+		line.erase();
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 13:16:19 by mservage          #+#    #+#             */
-/*   Updated: 2022/05/16 13:57:58 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/04 15:39:25 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,12 @@
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include "Server.hpp"
+#include "../inc/Server.hpp"
 #include <unistd.h>
+#include <stdlib.h>
 //#include "User.hpp"
 
-int	main(int ac, char **av, char **env)
+int	main(int ac, char **av)
 {
 	if (ac != 3)
 	{

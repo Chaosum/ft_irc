@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/04 17:22:05 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/04 17:33:34 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,18 +45,18 @@ private:
 	string _sendPrivmsgToChan(User * sender, string channel, string text);
 	string _sendPrivmsgToUser(User * sender, string recipient, string text);
 	// Server commands
-	string pass(User * user, string password);
-	string nick(User * user, string nickname);
-	string user(User * user, string username, string hostname, string servername, string realname);
-	void quit(User * user, string msg);
-	string join(User * user, vector<string> & requested_channels);
-	string part(User * user, vector<string> & channels);
-	string mode(User * user, string requested_channel, vector<string> & operands);
-	void topic(User * user, string channel, string topic);
-	string list(User * user, vector<string> & channels);
-	string kick(User * user, string channel, string kickee, string comment);
-	void privmsg(User * user, vector<string> & recipients, string msg);
-	void notice(User * user, string recipient, string msg);
+	// string pass(User * user, string password);
+	// string nick(User * user, string nickname);
+	// string user(User * user, string username, string hostname, string servername, string realname);
+	// void quit(User * user, string msg);
+	// string join(User * user, vector<string> & requested_channels);
+	// string part(User * user, vector<string> & channels);
+	// string mode(User * user, string requested_channel, vector<string> & operands);
+	// void topic(User * user, string channel, string topic);
+	// string list(User * user, vector<string> & channels);
+	// string kick(User * user, string channel, string kickee, string comment);
+	// void privmsg(User * user, vector<string> & recipients, string msg);
+	// void notice(User * user, string recipient, string msg);
 
 public:
 	Server();
@@ -65,9 +65,8 @@ public:
 	~Server();
 
 	Server	&operator=(Server const &rhs);
-	int	getPort(void) const;
+	int		getPort(void) const;
 	string	getServerName(void) const;
-	string	getServerPassword(void) const;
 	vector<pollfd> getFds();
 	void	init_listen();
 	void	wait_for_event();

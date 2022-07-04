@@ -5,14 +5,23 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
+<<<<<<< HEAD
 /*   Created: 2022/06/03 13:28:47 by matthieu          #+#    #+#             */
 /*   Updated: 2022/06/12 17:32:00 by matthieu         ###   ########.fr       */
+=======
+/*   Created: 2022/04/28 11:24:21 by matthieu          #+#    #+#             */
+/*   Updated: 2022/06/07 22:02:32 by lgaudet-         ###   ########.fr       */
+>>>>>>> origin/leto
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <netinet/in.h>
+<<<<<<< HEAD
 #include <unistd.h>
 #include "Server.hpp"
+=======
+#include "../inc/Server.hpp"
+>>>>>>> origin/leto
 
 Server::Server()
 {
@@ -161,3 +170,4 @@ void	Server::msg_parse(char *buf)
 		i++;
 	}
 }
+

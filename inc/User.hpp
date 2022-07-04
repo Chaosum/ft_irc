@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/05/16 12:06:02 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/04 17:23:09 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,23 +23,25 @@
 	le fd de sa socket
 	*/
 
+using namespace std;
+
 class User
 {
 private:
-	std::string	_name;
-	std::string	_password;
-	pollfd		_poll_fd;
-	bool		_isAuthentified;
+	string	_name;
+	string	_nick;
+	pollfd	_poll_fd;
+	bool	_isOp;
 public:
 	User();
-	User(std::string name, std::string password);
+	User(string name, string password);
 	User(User &src);
 
 	~User();
 	User	&operator=(User const &rhs);
 	pollfd	getPollFd(void) const;
-	std::string	getName(void) const;
-	void	setName(std::string name);
-	std::string	getPassword(void) const;
-	void	setPassword(std::string password);
+	string	getName(void) const;
+	void	setName(string name);
+	string	getNick(void) const;
+	void	setNick(string nick);
 };

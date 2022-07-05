@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 17:19:13 by mservage          #+#    #+#             */
-/*   Updated: 2022/06/24 16:58:54 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/05 12:23:02 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,16 @@
 
 User::User()
 {
+}
+
+User::User(pollfd newUser_pollfd)
+{
+	_isAuth = 0;
+	_isOp = 0;
+	_nick = "";
+	_poll_fd.events = newUser_pollfd.events;
+	_poll_fd.revents = newUser_pollfd.revents;
+	_poll_fd.fd = newUser_pollfd.fd;
 }
 
 User::User(std::string name, std::string password): _name(name)

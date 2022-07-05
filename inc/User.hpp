@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/04 17:34:19 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/05 12:23:21 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ private:
 	bool	_isAuth;
 public:
 	User();
+	User(pollfd newUser_pollfd);
 	User(string name, string password);
 	User(User &src);
 

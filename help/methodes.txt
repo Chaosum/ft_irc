@@ -15,3 +15,11 @@ INVITE
 LIST
 
 CRLF = \r\n
+
+do to list:
+
+matthou
+finir parsing
+_sendtext()
+condition pour pass / nick / user
+voir pour channel.cpp

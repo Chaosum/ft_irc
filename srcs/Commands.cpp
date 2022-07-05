@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/06/20 13:51:32 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/05 16:55:49 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,7 @@ string Server::_sendPrivmsgToChan(User * sender, string channel, string text) {
 	if (chan == _channels.end())
 		return ":" + _server_name + " 401" + channel + " :No such nick/channel";
 	if (chan->canUserMessageChannel(sender)) {
-		for (it = chan->getMembers().begin() ; it != chan->getMembers().end() ; ++it)
-			_send_txt((*it)->getPollFd(), _composePrefix(sender) + "PRIVMSG " + channel + " :" + text);
+		_sendTextToChan(sender, &*chan, _composePrefix(sender) + "PRIVMSG " + channel + " :" + text);
 		return "";
 	}
 	else
@@ -47,6 +46,24 @@ string Server::_sendPrivmsgToUser(User * sender, string recipient, string text) 
 	if (it == _users.end())
 		return ":" + _server_name + " 401" + recipient + " :No such nick/channel";
 	_send_txt(it->getPollFd(), _composePrefix(sender) + "PRIVMSG" + recipient + " :" + text);
+}
+
+string Server::_sendTextToChan(User * sender, Channel * chan, string text) {
+	vector<User*>::const_iterator it;
+
+	for (it = chan->getMembers().begin() ; it != chan->getMembers().end() ; ++it) {
+			_send_txt((*it)->getPollFd(), text);
+		}
+}
+
+
+void	Server::_nameList(Channel const & chan, User const * recipient) const {
+	vector<User*>::const_iterator member;
+	for (member = chan.getMembers().begin() ; member != chan.getMembers().end() ; member++) {
+		bool isOp = chan.isUserOp(*member) || (*member)->isOp();
+		_send_txt(recipient->getPollFd(), _composePrefix(NULL) + "353 " + chan.getName() + " :" + (isOp?"@":"+") + (*member)->getNick());
+	}
+	_send_txt(recipient->getPollFd(), _composePrefix(NULL) + "366 " + chan.getName() + ":End of /NAMES list");
 }
 
 string Server::pass(User * user, string password) {
@@ -66,7 +83,7 @@ void Server::quit(User * user, string msg) {
 		}
 }
 
-string Server::join(User * user, vector<string> & requested_channels) {
+void Server::join(User * user, vector<string> & requested_channels) {
 	vector<Channel>::iterator chan;
 	vector<string>::iterator it;
 	string topic;
@@ -78,15 +95,22 @@ string Server::join(User * user, vector<string> & requested_channels) {
 			if (chan->getName() == *it)
 				break;
 		if (chan != _channels.end()) {
-			chan->addUser(user);
+			if (!chan->addUser(user)) { // Cas où le channel est plein
+				_send_txt(user->getPollFd(), _composePrefix(NULL) + "471  " + chan->getName() + " :Cannot join channel (+l)");
+				return ;
+			}
 			topic = chan->getTopic();
-			if (topic == "")
+			if (topic.empty()) // Cas où le topic est vide
 				_send_txt(user->getPollFd(), _composePrefix(NULL) + "331 " + chan->getName() + " :No topic is set");
-			else
+			else // Cas où il y a un topic
 				_send_txt(user->getPollFd(), _composePrefix(NULL) + "332 " + chan->getName() + " :" + topic);
+			_nameList(*chan, user);
 		}
-		else {
-		// create channel
+		else { // Cas où le channel n'existe pas encore
+			_channels.push_back(Channel(*it));
+			_channels.back().addUser(user);
+			_channels.back().makeUserOp(user);
+			_nameList(_channels.back(), user);
 		}
 	}
 }
@@ -147,16 +171,13 @@ void Server::privmsg(User * user, vector<string> & recipients, string msg) {
 
 void Server::notice(User * user, string recipient, string msg) {
 	vector<User>::iterator it;
-	vector<User*>::const_iterator chan_user;
 	vector<Channel>::iterator chan;
 
 	if (recipient[0] == '#' || recipient[0] == '&') { // Case where the recipient is a channel
 		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 			if (chan->getName() == recipient)
 				break;
-		for (chan_user = chan->getMembers().begin() ; chan_user != chan->getMembers().end() ; ++chan_user) {
-			_send_txt((*chan_user)->getPollFd(), _composePrefix(user) + "NOTICE " + (*chan_user)->getNick() + " :" + msg);
-		}
+		_sendTextToChan(user, &*chan, _composePrefix(user) + "NOTICE " + (*chan_user)->getNick() + " :" + msg);
 	}
 	else
 		for (it = _users.begin() ; it != _users.end() ; ++it) {

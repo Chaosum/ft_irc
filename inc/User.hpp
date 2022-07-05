@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/04 17:23:09 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/05 16:25:53 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,13 @@ public:
 	User(User &src);
 
 	~User();
-	User	&operator=(User const &rhs);
-	pollfd	getPollFd(void) const;
-	string	getName(void) const;
-	void	setName(string name);
-	string	getNick(void) const;
-	void	setNick(string nick);
+
+	const string	getNick();
+	const bool		isOp();
+	User			&operator=(User const &rhs);
+	pollfd			getPollFd(void) const;
+	string			getName(void) const;
+	void			setName(string name);
+	string			getNick(void) const;
+	void			setNick(string nick);
 };

@@ -6,24 +6,24 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/05 16:55:49 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/05 19:16:49 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Server.hpp"
 
-string Server::_composePrefix(User * sender) {
+string Server::_composePrefix(User * sender) const{
 	string res = "";
 
 	if (sender == NULL)
 		return ":" + _server_name + " ";
-	res.append(":" + sender->getNick() + "!" + sender->getName());
+	res.append(":" + sender->getNick() + "!" + sender->getUserName());
 	res.append("@" + _server_name + " ");
 	return res;
 }
 
-string Server::_sendPrivmsgToChan(User * sender, string channel, string text) {
-	vector<Channel>::iterator chan;
+string Server::_sendPrivmsgToChan(User * sender, string channel, string text) const{
+	vector<Channel>::const_iterator chan;
 	vector<User*>::const_iterator it;
 	for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 		if (chan->getName() == channel)
@@ -38,8 +38,8 @@ string Server::_sendPrivmsgToChan(User * sender, string channel, string text) {
 		return ":" + _server_name + " 404" + channel + " :Cannot send to channel";
 }
 
-string Server::_sendPrivmsgToUser(User * sender, string recipient, string text) {
-	vector<User>::iterator it;
+string Server::_sendPrivmsgToUser(User * sender, string recipient, string text) const{
+	vector<User>::const_iterator it;
 	for (it = _users.begin() ; it != _users.end() ; ++it)
 		if (it->getNick() == recipient)
 			break; // the correct User is found
@@ -48,7 +48,7 @@ string Server::_sendPrivmsgToUser(User * sender, string recipient, string text) 
 	_send_txt(it->getPollFd(), _composePrefix(sender) + "PRIVMSG" + recipient + " :" + text);
 }
 
-string Server::_sendTextToChan(User * sender, Channel * chan, string text) {
+string Server::_sendTextToChan(User * sender, Channel * chan, string text) const{
 	vector<User*>::const_iterator it;
 
 	for (it = chan->getMembers().begin() ; it != chan->getMembers().end() ; ++it) {
@@ -56,6 +56,9 @@ string Server::_sendTextToChan(User * sender, Channel * chan, string text) {
 		}
 }
 
+void Server::_sendTextToUser(User * sender, User * recipient, string text) const{
+	_send_txt(recipient->getPollFd(), _composePrefix(sender) + text);
+}
 
 void	Server::_nameList(Channel const & chan, User const * recipient) const {
 	vector<User*>::const_iterator member;
@@ -66,12 +69,52 @@ void	Server::_nameList(Channel const & chan, User const * recipient) const {
 	_send_txt(recipient->getPollFd(), _composePrefix(NULL) + "366 " + chan.getName() + ":End of /NAMES list");
 }
 
-string Server::pass(User * user, string password) {
+bool	Server::_isNickAvailable(string nick) const{
+	vector<User>::const_iterator it;
+	for (it = _users.begin() ; it != _users.end() ; ++it)
+		if (it->getNick() == nick)
+			return true;
+	return false;
 }
-string Server::nick(User * user, string nickname) {
+
+void Server::pass(User * user, string password) {
+	if (user->isAuth())
+		_sendTextToUser(NULL, user, "462 :You may not reregister");
+	else if (password.empty())
+		_sendTextToUser(NULL, user, "461 PASS :Not enough parameters");
+	else {
+		user->setPasswd(password);
+		user->tryAuth();
+	}
 }
-string Server::user(User * user, string username, string hostname, string servername, string realname) {
+
+void Server::nick(User * user, string nickname) {
+	if (nickname.empty())
+		_sendTextToUser(NULL, user, "431 :No nickname given");
+	else if (!_isNickAvailable(nickname))
+		_sendTextToUser(NULL, user, "443 " + nickname + " :Nickname is already in use");
+	else if (!_isValidNickname(nickname))
+		_sendTextToUser(NULL, user, "432 " + nickname + " :Erroneus nickname");
+	else {
+		user->setNick(nickname);
+		user->tryAuth();
+	}
 }
+
+void Server::user(User * user, string userName, string hostName, string serverName, string realName) {
+	(void)serverName;
+	if (user->isAuth())
+		_sendTextToUser(NULL, user, "462 :You may not reregister");
+	else if (userName.empty() || hostName.empty() || serverName.empty() || realName.empty())
+		_sendTextToUser(NULL, user, "461 PASS :Not enough parameters");
+	else {
+		user->setUserName(userName);
+		user->setHostName(hostName);
+		user->setRealName(realName);
+		user->tryAuth();
+	}
+}
+
 void Server::quit(User * user, string msg) {
 	vector<Channel>::iterator chan;
 

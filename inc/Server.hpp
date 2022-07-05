@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/04 17:22:05 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/05 19:11:30 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,15 +41,20 @@ private:
 	vector<User>	_users;
 	vector<pollfd>	_fds;
 
-	string _composePrefix(User * sender);
-	string _sendPrivmsgToChan(User * sender, string channel, string text);
-	string _sendPrivmsgToUser(User * sender, string recipient, string text);
+	string	_composePrefix(User * sender) const;
+	string	_sendPrivmsgToChan(User * sender, string channel, string text) const;
+	string	_sendPrivmsgToUser(User * sender, string recipient, string text) const;
+	string	_sendTextToChan(User * sender, Channel * chan, string text) const;
+	void	_sendTextToUser(User * sender, User * recipient, string text) const;
+	void	_nameList(Channel const & chan, User const * recipient) const;
+	bool	_isNickAvailable(string nick) const;
+	bool	_isValidNickname(string nick) const;
 	// Server commands
-	string pass(User * user, string password);
-	string nick(User * user, string nickname);
-	string user(User * user, string username, string hostname, string servername, string realname);
+	void pass(User * user, string password);
+	void nick(User * user, string nickname);
+	void user(User * user, string username, string hostname, string servername, string realname);
 	void quit(User * user, string msg);
-	string join(User * user, vector<string> & requested_channels);
+	void join(User * user, vector<string> & requested_channels);
 	string part(User * user, vector<string> & channels);
 	string mode(User * user, string requested_channel, vector<string> & operands);
 	void topic(User * user, string channel, string topic);

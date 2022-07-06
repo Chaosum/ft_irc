@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/05 19:10:17 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/06 18:42:52 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,13 +45,13 @@ public:
 	string			getTopic() const;
 	size_t			getNumberOfMembers() const;
 	vector<User*>	getMembers() const;
-	bool			canUserMessageChannel(User * user) const; // see ERR_CANNOTSENDTOCHAN (404)
-	bool			isUserInChannel(User * user) const;
-	bool			isUserOp(User * user) const;
+	bool			canUserMessageChannel(User const * user) const; // see ERR_CANNOTSENDTOCHAN (404)
+	bool			isUserInChannel(User const * user) const;
+	bool			isUserOp(User const * user) const;
 	void			deleteUserFromChannel(User * user);
 	void			makeUserOp(User * user);
 	// Returns ton successful change
-	bool			addUser(User * user);
+	bool			addUser(User const * user);
 	bool			setPrivate(User const * user, bool value);
 	bool			setSecret(User const * user, bool value);
 	bool			setTopicSettableOnlyByOp(User const * user, bool value);

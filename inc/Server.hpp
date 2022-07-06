@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/05 19:11:30 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/06 18:41:20 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,11 @@ private:
 	vector<User>	_users;
 	vector<pollfd>	_fds;
 
-	string	_composePrefix(User * sender) const;
-	string	_sendPrivmsgToChan(User * sender, string channel, string text) const;
-	string	_sendPrivmsgToUser(User * sender, string recipient, string text) const;
-	string	_sendTextToChan(User * sender, Channel * chan, string text) const;
-	void	_sendTextToUser(User * sender, User * recipient, string text) const;
+	string	_composePrefix(User const * sender) const;
+	void	_sendPrivmsgToChan(User const * sender, string channel, string text) const;
+	void	_sendPrivmsgToUser(User const * sender, string recipient, string text) const;
+	void	_sendTextToChan(User const * sender, Channel const & chan, string text) const;
+	void	_sendTextToUser(User const * sender, User const * recipient, string text) const;
 	void	_nameList(Channel const & chan, User const * recipient) const;
 	bool	_isNickAvailable(string nick) const;
 	bool	_isValidNickname(string nick) const;

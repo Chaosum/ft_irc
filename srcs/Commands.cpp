@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/07 17:16:58 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/07 19:07:19 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,7 +158,29 @@ void Server::join(User * user, vector<string> & requested_channels) {
 	}
 }
 
-string Server::part(User * user, vector<string> & channels) {
+void Server::part(User * user, vector<string> & channels) {
+	vector<string>::iterator it;
+	vector<Channel>::iterator chan;
+
+	if (channels.empty()) {
+		_sendTextToUser(NULL, user, "461 PART :Not enough parameters");
+		return ;
+	}
+	for (it = channels.begin() ; it != channels.end() ; ++it) {
+		for (chan = _channels.begin() ; chan != _channels.end() && chan->getName() != *it ; ++chan)
+			// On parcourt les channels jusqu'à trouver le bon ou avoir atteint la fin de la liste
+			;
+		if (chan->getName() == *it) { // Cas où on a trouvé le channel
+			if (!chan->deleteUserFromChannel(user)) { // On essaie de supprimer le user de le channel
+				_sendTextToUser(NULL, user, "442 " + *it + " :You're not on that channel");
+				return ;
+			}
+		}
+		else { // Cas où on n'a pas trouvé le channel
+			_sendTextToUser(NULL, user, "403  " + *it + " :No such channel");
+			return ;
+		}
+	}
 }
 
 string Server::mode(User * user, string requested_channel, vector<string> & operands) {

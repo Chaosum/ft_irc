@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/07 16:43:38 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/07 18:56:37 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,10 @@ public:
 	bool			canUserMessageChannel(User const * user) const; // see ERR_CANNOTSENDTOCHAN (404)
 	bool			isUserInChannel(User const * user) const;
 	bool			isUserOp(User const * user) const;
-	void			deleteUserFromChannel(User * user);
 	void			makeUserOp(User * user);
 	// Returns ton successful change
 	bool			addUser(User const * user);
+	bool			deleteUserFromChannel(User * user);
 	bool			setPrivate(User const * user, bool value);
 	bool			isPrivate() const;
 	bool			setSecret(User const * user, bool value);

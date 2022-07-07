@@ -6,12 +6,14 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/06 18:41:39 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/07 17:16:58 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Server.hpp"
 
+// send the proper prefix of a message sent to a user
+// if sender param is NULL, the sender in the prefix is actually the server
 string Server::_composePrefix(User const * sender) const{
 	string res = "";
 
@@ -158,8 +160,10 @@ void Server::join(User * user, vector<string> & requested_channels) {
 
 string Server::part(User * user, vector<string> & channels) {
 }
+
 string Server::mode(User * user, string requested_channel, vector<string> & operands) {
 }
+
 void Server::topic(User * user, string channel, string topic) {
 	if (channel.empty()) {
 		_sendTextToUser(NULL, user, "461 TOPIC :Not enough parameters");
@@ -184,6 +188,34 @@ void Server::topic(User * user, string channel, string topic) {
 		_sendTextToUser(NULL, user, "332 " + channel + " :" + it->getTopic());
 	else
 		_sendTextToUser(NULL, user, "482 " + channel + " :You're not channel operator");
+}
+
+void Server::_listChannel(User const * user, Channel const & channel) {
+	if (!channel.isSecret() || channel.isUserInChannel(user)) {
+		string topic = "";
+		string chanName = "priv";
+		if (!channel.isPrivate() || channel.isUserInChannel(user)) {
+			chanName = channel.getName();
+			topic = channel.getTopic();
+		}
+		_sendTextToUser(NULL, user, "322 " + chanName + ":" + topic); // RPL_LIST
+	}
+}
+
+void Server::list(User * user, vector<string> & channels) {
+	vector<string>::const_iterator it;
+	vector<Channel>::const_iterator chan;
+
+	_sendTextToUser(NULL, user, "321 Channel :Users Name"); // RPL_LISTSTART
+	if (channels.empty()) // Cas où la commande n'a pas d'argument
+		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
+			_listChannel(user, *chan);
+	else // Cas où la commande a une liste d'arguments
+		for (it = channels.begin() ; it != channels.end() ; ++it)
+			for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
+				if (chan->getName() == *it)
+					_listChannel(user, *chan);
+	_sendTextToUser(NULL, user, "323 :End of /LIST"); // RPL_LISTEND
 }
 
 string Server::kick(User * user, string channel, string kickee, string comment) {

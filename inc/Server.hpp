@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/06 18:41:20 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/07 17:13:40 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ private:
 	void	_nameList(Channel const & chan, User const * recipient) const;
 	bool	_isNickAvailable(string nick) const;
 	bool	_isValidNickname(string nick) const;
+	void	_listChannel(User const * user, Channel const & chan);
 	// Server commands
 	void pass(User * user, string password);
 	void nick(User * user, string nickname);
@@ -58,7 +59,7 @@ private:
 	string part(User * user, vector<string> & channels);
 	string mode(User * user, string requested_channel, vector<string> & operands);
 	void topic(User * user, string channel, string topic);
-	string list(User * user, vector<string> & channels);
+	void list(User * user, vector<string> & channels);
 	string kick(User * user, string channel, string kickee, string comment);
 	void privmsg(User * user, vector<string> & recipients, string msg);
 	void notice(User * user, string recipient, string msg);

@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/06 18:42:52 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/07 16:43:38 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,9 @@ public:
 	// Returns ton successful change
 	bool			addUser(User const * user);
 	bool			setPrivate(User const * user, bool value);
+	bool			isPrivate() const;
 	bool			setSecret(User const * user, bool value);
+	bool			isSecret() const;
 	bool			setTopicSettableOnlyByOp(User const * user, bool value);
 	bool			setOperator(User const * op, User const * newOp);
 	bool			setMaxNbOfUsers(User const * op, int maxNb);

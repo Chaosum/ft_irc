@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/07 18:56:37 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/08 16:06:49 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ public:
 	// Returns ton successful change
 	bool			addUser(User const * user);
 	bool			deleteUserFromChannel(User * user);
+	bool			deleteUserFromChannel(string nickname);
 	bool			setPrivate(User const * user, bool value);
 	bool			isPrivate() const;
 	bool			setSecret(User const * user, bool value);

@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/07 19:07:19 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/08 17:01:26 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,7 +240,36 @@ void Server::list(User * user, vector<string> & channels) {
 	_sendTextToUser(NULL, user, "323 :End of /LIST"); // RPL_LISTEND
 }
 
-string Server::kick(User * user, string channel, string kickee, string comment) {
+void Server::kick(User * user, string channel, string kickee, string comment) {
+	vector<Channel>::iterator chan;
+
+	if (channel.empty() || kickee.empty()) {
+		_sendTextToUser(NULL, user, "461 KICK :Not enough parameters");
+		return ;
+	}
+	// On cherche le channel dans la liste
+	for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
+		if (chan->getName() != channel) // On a trouvé le bon channel
+			break ;
+	// Cas où le channel n'est pas trouvé
+	if (chan == _channels.end()) {
+		_sendTextToUser(NULL, user, "403 " + channel + " :No such channel");
+		return ;
+	}
+	if (!chan->isUserOp(user))
+		_sendTextToUser(NULL, user, "482 " + channel + " :You're not channel operator");
+	else if (!chan->deleteUserFromChannel(kickee))
+		_sendTextToUser(NULL, user, "441 " + kickee + " " + channel + " :They aren't on that channel");
+	else { // Cas où la commande a réussi
+		vector<User>::const_iterator targetUser;
+		string kickMsg = "KICK " + channel + " " + kickee + (comment.empty()?"":" :" + comment);
+
+		for (targetUser = _users.begin() ; targetUser != _users.end() ; ++targetUser)
+			if (targetUser->getNick() == kickee)
+				break ;
+		_sendTextToUser(user, &*targetUser, kickMsg);
+		_sendTextToChan(user, *chan, _composePrefix(user) + kickMsg);
+	}
 }
 
 void Server::privmsg(User * user, vector<string> & recipients, string msg) {

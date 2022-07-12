@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/12 13:14:37 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/12 14:44:21 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,7 @@ void	Server::wait_for_event()
 	}
 }
 
-std::string	getNextWord(std::string line, int *i, std::string tmp)
+std::string	Server::getNextWord(std::string line, int *i, std::string &tmp)
 {
 	tmp.clear();
 	while (line[*i] == ' ')
@@ -155,7 +155,7 @@ std::string	getNextWord(std::string line, int *i, std::string tmp)
 	return (tmp);
 }
 
-std::vector<std::string>	&getNextVector(std::string line, int *i, int lastword)
+std::vector<std::string>	&Server::getNextVector(std::string line, int *i, int lastword)
 {
 	std::vector<std::string> dest;
 	std::string tmp;
@@ -194,6 +194,8 @@ void	Server::msg_parse(char *buf, int index)
 			line = line + buf[i];
 			i++;
 		}
+		if (line[0] == ':')
+			getNextWord(line, &tmp_i, tmp);
 		if (line.compare(0, 5, "PASS ") == 0)
 		{
 			pass(&_users[index], getNextWord(line, &(tmp_i = 5), tmp));

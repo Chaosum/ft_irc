@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/05 17:20:32 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/12 13:14:37 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void	Server::init_listen()
 		std::cout << "Error, failed to grab connection" << std::endl;
 		exit(-1);
 	}
-	_fds.push_front(poll_fd);
+	_fds.push_back(poll_fd);
 }
 
 void	Server::wait_for_event()
@@ -129,6 +129,7 @@ void	Server::wait_for_event()
 					close(it->fd);
 					it = _fds.erase(it); 
 					quit(&_users[index], "");
+					_users.erase( _users.begin() + index);
 					continue ;
 				}
 			}
@@ -139,13 +140,55 @@ void	Server::wait_for_event()
 	}
 }
 
+std::string	getNextWord(std::string line, int *i, std::string tmp)
+{
+	tmp.clear();
+	while (line[*i] == ' ')
+	{
+		*i = *i + 1;
+	}
+	while (line[*i] != ' ' && line[*i] != '\r' && line[*i] != 0)
+	{
+		tmp = tmp + line[*i];
+		*i = *i + 1;
+	}
+	return (tmp);
+}
+
+std::vector<std::string>	&getNextVector(std::string line, int *i, int lastword)
+{
+	std::vector<std::string> dest;
+	std::string tmp;
+	int i_save = 0;
+
+	while (line[*i] != '\r' && line[*i] != 0)
+	{
+		tmp.clear();
+		i_save = *i;
+		while (line[*i] != ' ' && line[*i] != 0 && line[*i] != '\r')
+		{
+			tmp = tmp + line[*i];
+			*i = *i + 1;
+		}
+		dest.push_back(tmp);
+	}
+	if (lastword)
+	{
+		*i = i_save;
+		dest.erase(dest.end() - 1);
+	}
+	return (dest);
+}
+
 void	Server::msg_parse(char *buf, int index)
 {
 	int i = 0;
-	std::string line;
+	std::string	line;
+	std::string	tmp;
 
 	while (buf[i])
 	{
+		int tmp_i = 0;
 		while (buf[i] != '\n' && buf[i] != 0 & buf[i] != '\r')
 		{
 			line = line + buf[i];
@@ -153,31 +196,49 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		if (line.compare(0, 5, "PASS ") == 0)
 		{
-			pass(&_users[index], string password);
-
+			pass(&_users[index], getNextWord(line, &(tmp_i = 5), tmp));
 		}
-		else
-			return ;
-		if (line.compare(0, 5, "NICK ") == 0)
-			nick(&_users[index], string nickname);
+		else if (line.compare(0, 5, "NICK ") == 0)
+		{
+			nick(&_users[index], getNextWord(line, &(tmp_i = 5), tmp));
+		}
 		else if (line.compare(0, 5, "USER ") == 0)
-			user(&_users[index], string username, string hostname, string servername, string realname);
+		{
+			user(&_users[index], getNextWord(line, &(tmp_i = 5), tmp),getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
+		}
 		else if (line.compare(0, 5, "QUIT ") == 0)
-			quit(&_users[index], string msg);
+		{
+			quit(&_users[index], getNextWord(line, &tmp_i, tmp));
+		}
 		else if (line.compare(0, 5, "JOIN ") == 0)
-			join(&_users[index], vector<string> & requested_channels);
+		{
+			
+			join(&_users[index], getNextVector(line, &(tmp_i = 5), 1));
+		}
 		else if (line.compare(0, 5, "PART ") == 0)
-			part(&_users[index], vector<string> & channels);
+		{
+			part(&_users[index], getNextVector(line, &(tmp_i = 5), 0));
+		}
 		else if (line.compare(0, 5, "MODE ") == 0)
-			mode(&_users[index], string requested_channel, vector<string> & operands);
+		{
+			mode(&_users[index], getNextWord(line, &(tmp_i = 5), tmp), getNextVector(line, &tmp_i, 0));
+		}
 		else if (line.compare(0, 6, "TOPIC ") == 0)
-			topic(&_users[index], string channel, string topic);
+		{
+			topic(&_users[index], getNextWord(line, &(tmp_i = 6), tmp), getNextWord(line, &tmp_i, tmp));
+		}
 		else if (line.compare(0, 5, "LIST ") == 0)
-			list(&_users[index], vector<string> & channels);
+		{
+			list(&_users[index], getNextVector(line, &(tmp_i = 5), 1));
+		}
 		else if (line.compare(0, 5, "KICK ") == 0)
-			kick(&_users[index], string channel, string kickee, string comment);
+		{
+			kick(&_users[index], getNextWord(line, &(tmp_i = 5), tmp), getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
+		}
 		else if (line.compare(0, 8, "PRIVMSG ") == 0)
-			privmsg(&_users[index], vector<string> & recipients, string msg);
+		{
+			privmsg(&_users[index], getNextVector(line, &(tmp_i = 8), 1), getNextWord(line, &tmp_i, tmp));
+		}
 		i++;
 		line.erase();
 	}

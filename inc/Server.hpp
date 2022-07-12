@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/05 13:15:07 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/12 14:54:26 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,20 +41,26 @@ private:
 	vector<User>	_users;
 	vector<pollfd>	_fds;
 
-	string _composePrefix(User * sender);
-	string _sendPrivmsgToChan(User * sender, string channel, string text);
-	string _sendPrivmsgToUser(User * sender, string recipient, string text);
-	//server command
-	string pass(User * user, string password);
-	string nick(User * user, string nickname);
-	string user(User * user, string username, string hostname, string servername, string realname);
+	string	_composePrefix(User const * sender) const;
+	void	_sendPrivmsgToChan(User const * sender, string channel, string text) const;
+	void	_sendPrivmsgToUser(User const * sender, string recipient, string text) const;
+	void	_sendTextToChan(User const * sender, Channel const & chan, string text) const;
+	void	_sendTextToUser(User const * sender, User const * recipient, string text) const;
+	void	_nameList(Channel const & chan, User const * recipient) const;
+	bool	_isNickAvailable(string nick) const;
+	bool	_isValidNickname(string nick) const;
+	void	_listChannel(User const * user, Channel const & chan);
+	// Server commands
+	void pass(User * user, string password);
+	void nick(User * user, string nickname);
+	void user(User * user, string username, string hostname, string servername, string realname);
 	void quit(User * user, string msg);
-	string join(User * user, vector<string> & requested_channels);
-	string part(User * user, vector<string> & channels);
+	void join(User * user, vector<string> & requested_channels);
+	void part(User * user, vector<string> & channels);
 	string mode(User * user, string requested_channel, vector<string> & operands);
 	void topic(User * user, string channel, string topic);
-	string list(User * user, vector<string> & channels);
-	string kick(User * user, string channel, string kickee, string comment);
+	void list(User * user, vector<string> & channels);
+	void kick(User * user, string channel, string kickee, string comment);
 	void privmsg(User * user, vector<string> & recipients, string msg);
 	void notice(User * user, string recipient, string msg);
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/08 17:01:26 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/14 13:36:59 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,20 @@ bool	Server::_isNickAvailable(string nick) const{
 			return true;
 	return false;
 }
+
+bool	Server::_isValidNickname(string nick) const // a modif
+{
+	int i = 0;
+	while (nick[i])
+	{
+		if (isalnum(nick[i]))
+			i++;
+		else
+			return (false);
+	}
+	return (true);
+}
+
 
 void Server::pass(User * user, string password) {
 	if (user->isAuth())
@@ -183,7 +197,7 @@ void Server::part(User * user, vector<string> & channels) {
 	}
 }
 
-string Server::mode(User * user, string requested_channel, vector<string> & operands) {
+void Server::mode(User * user, string requested_channel, vector<string> & operands) {
 }
 
 void Server::topic(User * user, string channel, string topic) {

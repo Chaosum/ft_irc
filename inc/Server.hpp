@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/12 15:03:05 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/14 13:11:39 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <string>
 #include <iostream>
 #include "Channel.hpp"
+#include "User.hpp"
 
 /* server contient:
 	la liste des channel
@@ -50,6 +51,7 @@ private:
 	bool	_isNickAvailable(string nick) const;
 	bool	_isValidNickname(string nick) const;
 	void	_listChannel(User const * user, Channel const & chan);
+
 	// Server commands
 	void pass(User * user, string password);
 	void nick(User * user, string nickname);
@@ -57,7 +59,7 @@ private:
 	void quit(User * user, string msg);
 	void join(User * user, vector<string> & requested_channels);
 	void part(User * user, vector<string> & channels);
-	string mode(User * user, string requested_channel, vector<string> & operands);
+	void mode(User * user, string requested_channel, vector<string> & operands);
 	void topic(User * user, string channel, string topic);
 	void list(User * user, vector<string> & channels);
 	void kick(User * user, string channel, string kickee, string comment);
@@ -70,6 +72,7 @@ public:
 	Server(string server_name, int port, char *password);
 	~Server();
 
+	void	_send_txt(pollfd poll_fd, string text) const;
 	Server	&operator=(Server const &rhs);
 	int		getPort(void) const;
 	string	getServerName(void) const;
@@ -77,6 +80,6 @@ public:
 	void	init_listen();
 	void	wait_for_event();
 	void	msg_parse(char *buf, int index);
-	string	getNextWord(std::string line, int *i, std::string &tmp);
-	vector<std::string>	&getNextVector(std::string line, int *i, int lastword);
+	string	getNextWord(std::string line, int *i, std::string &tmp) const;
+	vector<std::string>	getNextVector(std::string line, int *i, int lastword);
 };

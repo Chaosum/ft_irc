@@ -6,11 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2022/07/04 17:33:27 by matthieu         ###   ########.fr       */
-=======
-/*   Updated: 2022/07/08 16:06:49 by lgaudet-         ###   ########lyon.fr   */
->>>>>>> leto2
+/*   Updated: 2022/07/14 13:43:45 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +31,11 @@ private:
 	bool			_isSecret;
 	bool			_topicSettableOnlyByOp;
 
-	Channel();
-	Channel(Channel const &src);
 	bool isOp(User const * user);
 	
 public:
+	Channel();
+	Channel(Channel const &src);
 	Channel(string name);
 	
 	~Channel();

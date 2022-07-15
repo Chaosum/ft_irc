@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/05 19:09:31 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/14 13:25:38 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,14 @@ private:
 	pollfd	_poll_fd;
 	bool	_isOp;
 	bool	_isAuth;
+	string	_password;
 public:
 	User();
-	User(string name, string password);
-	User(User &src);
+	User(pollfd newUser_pollfd);
+	User(User const &src);
 
 	~User();
 
-	string	getNick();
 	bool	isOp();
 	User	&operator=(User const &rhs);
 	pollfd	getPollFd(void) const;

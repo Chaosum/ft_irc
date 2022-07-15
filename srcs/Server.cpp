@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/12 14:44:21 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/14 13:50:22 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 #define MAXUSER 666
 
-Server::Server()
+Server::Server(): _password("blabla")
 {
 }
 
@@ -110,7 +110,7 @@ void	Server::wait_for_event()
 			_users.push_back(newUser);//verifier le constructeur
 		}
 		std::vector<pollfd>::iterator	it = _fds.begin();
-		int index = 1;
+		int index = 0;
 		it++;
 		int read_ret = 1;
 		while (it != _fds.end())
@@ -140,7 +140,7 @@ void	Server::wait_for_event()
 	}
 }
 
-std::string	Server::getNextWord(std::string line, int *i, std::string &tmp)
+std::string	Server::getNextWord(std::string line, int *i, std::string &tmp) const
 {
 	tmp.clear();
 	while (line[*i] == ' ')
@@ -155,12 +155,11 @@ std::string	Server::getNextWord(std::string line, int *i, std::string &tmp)
 	return (tmp);
 }
 
-std::vector<std::string>	&Server::getNextVector(std::string line, int *i, int lastword)
+std::vector<std::string>	Server::getNextVector(std::string line, int *i, int lastword)
 {
 	std::vector<std::string> dest;
 	std::string tmp;
 	int i_save = 0;
-
 	while (line[*i] != '\r' && line[*i] != 0)
 	{
 		tmp.clear();
@@ -185,6 +184,7 @@ void	Server::msg_parse(char *buf, int index)
 	int i = 0;
 	std::string	line;
 	std::string	tmp;
+	std::vector<string> temp_vector;
 
 	while (buf[i])
 	{
@@ -198,6 +198,7 @@ void	Server::msg_parse(char *buf, int index)
 			getNextWord(line, &tmp_i, tmp);
 		if (line.compare(0, 5, "PASS ") == 0)
 		{
+			printf("salut!\n");
 			pass(&_users[index], getNextWord(line, &(tmp_i = 5), tmp));
 		}
 		else if (line.compare(0, 5, "NICK ") == 0)
@@ -215,15 +216,15 @@ void	Server::msg_parse(char *buf, int index)
 		else if (line.compare(0, 5, "JOIN ") == 0)
 		{
 			
-			join(&_users[index], getNextVector(line, &(tmp_i = 5), 1));
+			join(&_users[index], temp_vector = getNextVector(line, &(tmp_i = 5), 1));
 		}
 		else if (line.compare(0, 5, "PART ") == 0)
 		{
-			part(&_users[index], getNextVector(line, &(tmp_i = 5), 0));
+			part(&_users[index], temp_vector = getNextVector(line, &(tmp_i = 5), 0));
 		}
 		else if (line.compare(0, 5, "MODE ") == 0)
 		{
-			mode(&_users[index], getNextWord(line, &(tmp_i = 5), tmp), getNextVector(line, &tmp_i, 0));
+			mode(&_users[index], getNextWord(line, &(tmp_i = 5), tmp), temp_vector = getNextVector(line, &tmp_i, 0));
 		}
 		else if (line.compare(0, 6, "TOPIC ") == 0)
 		{
@@ -231,7 +232,7 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (line.compare(0, 5, "LIST ") == 0)
 		{
-			list(&_users[index], getNextVector(line, &(tmp_i = 5), 1));
+			list(&_users[index], temp_vector = getNextVector(line, &(tmp_i = 5), 1));
 		}
 		else if (line.compare(0, 5, "KICK ") == 0)
 		{
@@ -239,9 +240,34 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (line.compare(0, 8, "PRIVMSG ") == 0)
 		{
-			privmsg(&_users[index], getNextVector(line, &(tmp_i = 8), 1), getNextWord(line, &tmp_i, tmp));
+			privmsg(&_users[index],temp_vector = getNextVector(line, &(tmp_i = 8), 1), getNextWord(line, &tmp_i, tmp));
 		}
 		i++;
 		line.erase();
+	}
+}
+
+void	Server::_send_txt(pollfd poll_fd, string text) const// couper en 512 et rajouter \r\n
+{
+	string prefixe;
+	string dest;
+	int p_size = 0;
+	if (text[0] == ':')
+		getNextWord(text, &p_size, prefixe);
+	int i = p_size;
+	while(text[i] == ' ' && text[i] != 0)
+		i++;
+	while(text[i] != 0)
+	{
+		dest = dest + prefixe;
+		while (dest.size() < 510 && text[i] != 0)
+		{
+			dest = dest + text[i];
+			i++;
+		}
+		dest = dest + '\r';
+		dest = dest + '\n';
+		send(poll_fd.fd, dest.c_str(), dest.size(), 0);
+		dest.clear();
 	}
 }

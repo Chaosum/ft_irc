@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 17:19:13 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/05 12:23:02 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/14 13:10:33 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,16 +26,9 @@ User::User(pollfd newUser_pollfd)
 	_poll_fd.fd = newUser_pollfd.fd;
 }
 
-User::User(std::string name, std::string password): _name(name)
+User::User(User const &src)
 {
-	_poll_fd.fd = socket(AF_INET, SOCK_STREAM, 0);
-	_poll_fd.events = POLLIN|POLLOUT;
-	_poll_fd.revents = 0;
-}
-
-User::User(User &src)
-{
-	this->_name = src._name;
+	this->_userName = src._userName;//a refaire
 	this->_poll_fd = src._poll_fd;
 }
 
@@ -43,12 +36,17 @@ User::~User()
 {
 }
 
-User	&User::operator=(User const &rhs)
+User	&User::operator=(User const &rhs)// arefaire
 {
-	this->_name = rhs._name;
+	this->_userName = rhs._userName;
 	this->_poll_fd = rhs._poll_fd;
 
 	return (*this);
+}
+
+bool	User::isOp()
+{
+	return (this->_isOp);
 }
 
 pollfd	User::getPollFd(void) const
@@ -56,12 +54,64 @@ pollfd	User::getPollFd(void) const
 	return (this->_poll_fd);
 }
 
-std::string	User::getName(void) const
+std::string	User::getUserName(void) const
 {
-	return (this->_name);
+	return (this->_userName);
 }
 
-void	User::setName(std::string name)
+void	User::setUserName(std::string name)
 {
-	this->_name = name;
+	this->_userName = name;
+}
+
+std::string	User::getRealName(void) const
+{
+	return (this->_userName);
+}
+
+void	User::setRealName(string name)
+{
+	_realName = name;
+}
+
+string	User::getHostName(void) const
+{
+	return (this->_hostName);
+}
+
+void	User::setHostName(string name)
+{
+	_hostName = name;
+}
+
+string	User::getNick(void) const
+{
+	return (this->_nick);
+}
+
+void	User::setNick(string nick)
+{
+	_nick = nick;
+}
+
+string	User::getSuppliedPasswd(void) const
+{
+	return (this->_suppliedPassword);
+}
+
+void	User::setPasswd(string passwd)
+{
+	_password = passwd;
+}
+
+bool	User::isAuth() const
+{
+	return (this->_isAuth);
+}
+
+bool	User::tryAuth()
+{
+	if (isAuth())
+		return (true);
+	return (false);
 }

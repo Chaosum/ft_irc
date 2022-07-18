@@ -6,11 +6,8 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2022/07/04 17:33:27 by matthieu         ###   ########.fr       */
-=======
+/*   Updated: 2022/07/18 17:48:22 by lgaudet-         ###   ########lyon.fr   */
 /*   Updated: 2022/07/08 16:06:49 by lgaudet-         ###   ########lyon.fr   */
->>>>>>> leto2
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +26,7 @@ private:
 	string			_name;
 	string			_topic;
 	vector<User*>	_members;
-	vector<User*>	_ops;
+	vector<User*>	_chanOps;
 	size_t			_maxNbOfUsers;
 	bool			_isPrivate;
 	bool			_isSecret;
@@ -49,10 +46,11 @@ public:
 	string			getTopic() const;
 	size_t			getNumberOfMembers() const;
 	vector<User*>	getMembers() const;
+	User *			getMember(string nick) const;
 	bool			canUserMessageChannel(User const * user) const; // see ERR_CANNOTSENDTOCHAN (404)
 	bool			isUserInChannel(User const * user) const;
-	bool			isUserOp(User const * user) const;
-	void			makeUserOp(User * user);
+	bool			isUserChanOp(User const * user) const;
+	void			setUserChanOp(User * user, bool value);
 	// Returns ton successful change
 	bool			addUser(User const * user);
 	bool			deleteUserFromChannel(User * user);
@@ -62,7 +60,6 @@ public:
 	bool			setSecret(User const * user, bool value);
 	bool			isSecret() const;
 	bool			setTopicSettableOnlyByOp(User const * user, bool value);
-	bool			setOperator(User const * op, User const * newOp);
 	bool			setMaxNbOfUsers(User const * op, int maxNb);
 	bool			setTopic(User const * user, string topic);
 	bool			setName(User const * user, string name);

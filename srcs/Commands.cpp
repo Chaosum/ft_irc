@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/08 17:01:26 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/18 18:12:26 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void Server::_sendTextToUser(User const * sender, User const * recipient, string
 void	Server::_nameList(Channel const & chan, User const * recipient) const {
 	vector<User*>::const_iterator member;
 	for (member = chan.getMembers().begin() ; member != chan.getMembers().end() ; member++) {
-		bool isOp = chan.isUserOp(*member) || (*member)->isOp();
+		bool isOp = chan.isUserChanOp(*member);
 		_sendTextToUser(NULL, recipient, "353 " + chan.getName() + " :" + (isOp?"@":"+") + (*member)->getNick());
 	}
 	_sendTextToUser(NULL, recipient, "366 " + chan.getName() + ":End of /NAMES list");
@@ -118,7 +118,7 @@ void Server::user(User * user, string userName, string hostName, string serverNa
 void Server::quit(User * user, string msg) {
 	vector<Channel>::iterator chan;
 
-	msg = msg == ""? user->getNick() + " is quitting the server" : msg;
+	msg = msg.empty()? user->getNick() + " is quitting the server" : msg;
 	for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 		if (chan->isUserInChannel(user)) {
 			notice(user, chan->getName(), msg);
@@ -183,7 +183,118 @@ void Server::part(User * user, vector<string> & channels) {
 	}
 }
 
-string Server::mode(User * user, string requested_channel, vector<string> & operands) {
+void Server::_userMode(User * user, User * targetUser, vector<string> & operands) {
+	if (operands.empty())
+		_sendTextToUser(NULL, user, "221 ");
+	else
+		_sendTextToUser(NULL, user, "501 :Unknown MODE flag");
+}
+
+void Server::_channelMode(User * user, Channel * channel, vector<string> & operands) {
+	bool add;
+	string modeString = operands[0];
+	vector<string>::const_iterator currOp = operands.begin() + 1;
+
+	if (modeString[0] == '-')
+		add = false;
+	else if (modeString[0] == '+')
+		add = true;
+	else {
+		_sendTextToUser(NULL, user, string("472 ") + modeString[0] + " :is unknown mode char to me for " + channel->getName());
+		return ;
+	}
+	for (int i = 1 ; i < modeString.size() ; ++i) {
+		if (modeString[i] == 'o') {
+			if (currOp->empty()) {
+				_sendTextToUser(NULL, user, "461 MODE :Not enough parameters");
+				return ;
+			}
+			User * targetUser = channel->getMember(*(currOp++));
+			if (!targetUser) {
+				_sendTextToUser(NULL, user, "441 " + *(currOp - 1) + " " + channel->getName() + " :They aren't on that channel");
+				return ; 
+			}
+			if ((user == targetUser && !add) || channel->isUserChanOp(user)) {
+				if (add)
+					channel->setUserChanOp(targetUser, true);
+				else
+					channel->setUserChanOp(targetUser, false);
+			}
+			else {
+				_sendTextToUser(NULL, user, "482 " + channel->getName() + " :You're not channel operator");
+				return ;
+			}
+		}
+		else if (!channel->isUserChanOp(user)) {
+			_sendTextToUser(NULL, user, "482 " + channel->getName() + " :You're not channel operator");
+			return ;
+		}
+		else if (modeString[i] == 'p') {
+			if (add)
+				channel->setPrivate(user, true);
+			else
+				channel->setPrivate(user, false);
+		}
+		else if (modeString[i] == 's') {
+			if (add)
+				channel->setSecret(user, true);
+			else
+				channel->setSecret(user, false);
+		}
+		else if (modeString[i] == 't') {
+			if (add)
+				channel->setTopicSettableOnlyByOp(user, true);
+			else
+				channel->setTopicSettableOnlyByOp(user, false);
+		}
+		else if (modeString[i] == 'l') {
+			if (add) {
+				if (currOp->empty()) {
+					_sendTextToUser(NULL, user, "461 MODE :Not enough parameters");
+					return ;
+				}
+				stringstream ss;
+				int requestedNumberOfUsers;
+				ss << *(currOp++);
+				ss >> requestedNumberOfUsers; // must perform error handling
+				channel->setMaxNbOfUsers(user, requestedNumberOfUsers);
+			}
+			else
+				channel->setMaxNbOfUsers(user, numeric_limits<int>::max());
+		}
+		else {
+			_sendTextToUser(NULL, user, string("472 ") + modeString[i] + " :is unknown mode char to me for " + channel->getName());
+			return ;
+		}
+	}
+}
+
+void Server::mode(User * user, string requested_channel_or_user, vector<string> & operands) {
+	vector<User>::iterator requestedUser;
+	vector<Channel>::iterator requestedChannel;
+
+	if (requested_channel_or_user.empty()) {
+		_sendTextToUser(NULL, user, "461 MODE :Not enough parameters");
+		return ;
+	}
+	for (requestedUser = _users.begin() ; requestedUser != _users.end() ; ++requestedUser)
+		if (requestedUser->getNick() == requested_channel_or_user)
+			break ; // The correct user has been found
+	if (requestedUser != _users.end()) { // If the user has been found, try to apply requested changes
+		_userMode(user, &*requestedUser, operands);
+		return ;
+	}
+	for (requestedChannel = _channels.begin() ; requestedChannel != _channels.end() ; ++ requestedChannel)
+		if (requestedChannel->getName() == requested_channel_or_user)
+			break ; // The correct channel has been found
+	if (requestedChannel != _channels.end()) {
+		_channelMode(user, &*requestedChannel, operands);
+		return ;
+	}
+	else {
+		_sendTextToUser(NULL, user, "401 " + requested_channel_or_user + ":No such nick/channel");
+		return ;
+	}
 }
 
 void Server::topic(User * user, string channel, string topic) {
@@ -256,7 +367,7 @@ void Server::kick(User * user, string channel, string kickee, string comment) {
 		_sendTextToUser(NULL, user, "403 " + channel + " :No such channel");
 		return ;
 	}
-	if (!chan->isUserOp(user))
+	if (!chan->isUserChanOp(user))
 		_sendTextToUser(NULL, user, "482 " + channel + " :You're not channel operator");
 	else if (!chan->deleteUserFromChannel(kickee))
 		_sendTextToUser(NULL, user, "441 " + kickee + " " + channel + " :They aren't on that channel");

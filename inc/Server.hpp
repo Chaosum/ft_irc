@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/12 14:54:26 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/18 18:09:47 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string>
+#include <sstream>
 #include <iostream>
+#include <limits>
 #include "Channel.hpp"
 
 /* server contient:
@@ -50,6 +52,8 @@ private:
 	bool	_isNickAvailable(string nick) const;
 	bool	_isValidNickname(string nick) const;
 	void	_listChannel(User const * user, Channel const & chan);
+	void	_userMode(User * user, User * targetUser, vector<string> & operands);
+	void	_channelMode(User * user, Channel * channel, vector<string> & operands);
 	// Server commands
 	void pass(User * user, string password);
 	void nick(User * user, string nickname);
@@ -57,7 +61,7 @@ private:
 	void quit(User * user, string msg);
 	void join(User * user, vector<string> & requested_channels);
 	void part(User * user, vector<string> & channels);
-	string mode(User * user, string requested_channel, vector<string> & operands);
+	void mode(User * user, string requested_channel_or_user, vector<string> & operands);
 	void topic(User * user, string channel, string topic);
 	void list(User * user, vector<string> & channels);
 	void kick(User * user, string channel, string kickee, string comment);

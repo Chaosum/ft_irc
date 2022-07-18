@@ -23,3 +23,33 @@ finir parsing
 _sendtext()
 condition pour pass / nick / user
 voir pour channel.cpp
+
+leto
+revoir sortie normale de
+-topic
+-part
+-join
+-quit
+
+mode: o p s l
+401 ERR_NOSUCHNICK
+
+mode channel: o p s t l
+ERR_NEEDMOREPARAMS
+ERR_USERNOTINCHANNEL
+RPL_CHANNELMODEIS
+RPL_UNIQOPIS
+ERR_CHANOPRIVSNEEDED
+ERR_UNKNOWNMODE
+
+441    ERR_USERNOTINCHANNEL
+              "<nick> <channel> :They aren't on that channel"
+324    RPL_CHANNELMODEIS
+              "<channel> <mode> <mode params>"
+325    RPL_UNIQOPIS
+              "<channel> <nickname>"
+482    ERR_CHANOPRIVSNEEDED
+              "<channel> :You're not channel operator"
+472    ERR_UNKNOWNMODE
+              "<char> :is unknown mode char to me for <channel>"
+

@@ -31,9 +31,6 @@ revoir sortie normale de
 -join
 -quit
 
-mode: o p s l
-401 ERR_NOSUCHNICK
-
 mode channel: o p s t l
 ERR_NEEDMOREPARAMS
 ERR_USERNOTINCHANNEL
@@ -56,3 +53,39 @@ ERR_UNKNOWNMODE
 
  421    ERR_UNKNOWNCOMMAND
               "<command> :Unknown command"
+464    ERR_PASSWDMISMATCH
+              ":Password incorrect"
+467    ERR_KEYSET
+              "<channel> :Channel key already set"
+       471    ERR_CHANNELISFULL
+              "<channel> :Cannot join channel (+l)"
+       472    ERR_UNKNOWNMODE
+              "<char> :is unknown mode char to me for <channel>"
+       473    ERR_INVITEONLYCHAN
+              "<channel> :Cannot join channel (+i)"
+       474    ERR_BANNEDFROMCHAN
+              "<channel> :Cannot join channel (+b)"
+       475    ERR_BADCHANNELKEY
+              "<channel> :Cannot join channel (+k)"
+       476    ERR_BADCHANMASK
+              "<channel> :Bad Channel Mask"
+       477    ERR_NOCHANMODES
+              "<channel> :Channel doesn't support modes"
+       478    ERR_BANLISTFULL
+              "<channel> <char> :Channel list is full"
+
+       481    ERR_NOPRIVILEGES
+              ":Permission Denied- You're not an IRC operator"
+
+         - Any command requiring operator privileges to operate
+           MUST return this error to indicate the attempt was
+           unsuccessful.
+
+       482    ERR_CHANOPRIVSNEEDED
+              "<channel> :You're not channel operator"
+
+         - Any command requiring 'chanop' privileges (such as
+           MODE messages) MUST return this error if the client
+           making the attempt is not a chanop on the specified
+           channel.
+

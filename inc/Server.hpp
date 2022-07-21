@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/21 14:58:28 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/21 15:25:22 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ private:
 	vector<pollfd>	_fds;
 
 	string	_composePrefix(User const * sender) const;
+	string	_composeRplMessage(string errCode, User const * user) const;
 	void	_sendPrivmsgToChan(User const * sender, string channel, string text) const;
 	void	_sendPrivmsgToUser(User const * sender, string recipient, string text) const;
 	void	_sendTextToChan(User const * sender, Channel const & chan, string text) const;

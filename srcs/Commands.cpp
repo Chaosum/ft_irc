@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/21 14:58:37 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/21 15:25:22 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,10 @@ string Server::_composePrefix(User const * sender) const{
 	return res;
 }
 
+string Server::_composeRplMessage(string errCode, User const * user) const {
+	return errCode + " " + user->getNick() + " ";
+}
+
 void Server::_sendPrivmsgToChan(User const * sender, string channel, string text) const{
 	vector<Channel>::const_iterator chan;
 	vector<User*>::const_iterator it;
@@ -31,9 +35,9 @@ void Server::_sendPrivmsgToChan(User const * sender, string channel, string text
 		if (chan->getName() == channel)
 			break;
 	if (chan == _channels.end())
-		_sendTextToUser(NULL, sender, "401" + channel + " :No such nick/channel");
+		_sendTextToUser(NULL, sender, _composeRplMessage("401", sender) + channel + " :No such nick/channel");
 	if (!chan->canUserMessageChannel(sender))
-		_sendTextToUser(NULL, sender, "404 " + channel + " :Cannot send to channel");
+		_sendTextToUser(NULL, sender, _composeRplMessage("404", sender) + channel + " :Cannot send to channel");
 	else
 		_sendTextToChan(sender, *chan, _composePrefix(sender) + "PRIVMSG " + channel + " :" + text);
 }
@@ -44,7 +48,7 @@ void Server::_sendPrivmsgToUser(User const * sender, string recipient, string te
 		if (it->getNick() == recipient)
 			break; // the correct User is found
 	if (it == _users.end())
-		_sendTextToUser(NULL, sender, "401 " + recipient + " :No such nick/channel");
+		_sendTextToUser(NULL, sender, _composeRplMessage("401", sender) + recipient + " :No such nick/channel");
 	_sendTextToUser(sender, &*it, _composePrefix(sender) + "PRIVMSG" + recipient + " :" + text);
 }
 
@@ -64,9 +68,9 @@ void	Server::_nameList(Channel const & chan, User const * recipient) const {
 	vector<User*>::const_iterator member;
 	for (member = chan.getMembers().begin() ; member != chan.getMembers().end() ; member++) {
 		bool isOp = chan.isUserChanOp(*member);
-		_sendTextToUser(NULL, recipient, "353 " + chan.getName() + " :" + (isOp?"@":"+") + (*member)->getNick());
+		_sendTextToUser(NULL, recipient, _composeRplMessage("353", recipient) + chan.getName() + " :" + (isOp?"@":"+") + (*member)->getNick());
 	}
-	_sendTextToUser(NULL, recipient, "366 " + chan.getName() + ":End of /NAMES list");
+	_sendTextToUser(NULL, recipient, _composeRplMessage("366", recipient) + chan.getName() + ":End of /NAMES list");
 }
 
 bool	Server::_isNickAvailable(string nick) const{
@@ -79,9 +83,9 @@ bool	Server::_isNickAvailable(string nick) const{
 
 void Server::pass(User * user, string password) {
 	if (user->isAuth())
-		_sendTextToUser(NULL, user, "462 :You may not reregister");
+		_sendTextToUser(NULL, user, _composeRplMessage("462", user) + ":You may not reregister");
 	else if (password.empty())
-		_sendTextToUser(NULL, user, "461 PASS :Not enough parameters");
+		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "PASS :Not enough parameters");
 	else {
 		user->setPasswd(password);
 		user->tryAuth();
@@ -90,11 +94,11 @@ void Server::pass(User * user, string password) {
 
 void Server::nick(User * user, string nickname) {
 	if (nickname.empty())
-		_sendTextToUser(NULL, user, "431 :No nickname given");
+		_sendTextToUser(NULL, user, _composeRplMessage("431", user) + ":No nickname given");
 	else if (!_isNickAvailable(nickname))
-		_sendTextToUser(NULL, user, "443 " + nickname + " :Nickname is already in use");
+		_sendTextToUser(NULL, user, _composeRplMessage("443", user) + nickname + " :Nickname is already in use");
 	else if (!_isValidNickname(nickname))
-		_sendTextToUser(NULL, user, "432 " + nickname + " :Erroneus nickname");
+		_sendTextToUser(NULL, user, _composeRplMessage("432", user) + nickname + " :Erroneus nickname");
 	else {
 		user->setNick(nickname);
 		user->tryAuth();
@@ -104,9 +108,9 @@ void Server::nick(User * user, string nickname) {
 void Server::user(User * user, string userName, string hostName, string serverName, string realName) {
 	(void)serverName;
 	if (user->isAuth())
-		_sendTextToUser(NULL, user, "462 :You may not reregister");
+		_sendTextToUser(NULL, user, _composeRplMessage("462", user) + ":You may not reregister");
 	else if (userName.empty() || hostName.empty() || serverName.empty() || realName.empty())
-		_sendTextToUser(NULL, user, "461 PASS :Not enough parameters");
+		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "PASS :Not enough parameters");
 	else {
 		user->setUserName(userName);
 		user->setHostName(hostName);
@@ -132,21 +136,21 @@ void Server::join(User * user, vector<string> & requested_channels) {
 	string topic;
 
 	if (requested_channels.empty())
-		_sendTextToUser(NULL, user, "461 JOIN :Not enough parameters");
+		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "JOIN :Not enough parameters");
 	for (it = requested_channels.begin() ; it != requested_channels.end() ; ++it) {
 		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 			if (chan->getName() == *it)
 				break;
 		if (chan != _channels.end()) {
 			if (!chan->addUser(user)) { // Cas où le channel est plein
-				_sendTextToUser(NULL, user, "471  " + chan->getName() + " :Cannot join channel (+l)");
+				_sendTextToUser(NULL, user, _composeRplMessage("471", user) + chan->getName() + " :Cannot join channel (+l)");
 				return ;
 			}
 			topic = chan->getTopic();
 			if (topic.empty()) // Cas où le topic est vide
-				_sendTextToUser(NULL, user, "331 " + chan->getName() + " :No topic is set");
+				_sendTextToUser(NULL, user, _composeRplMessage("331", user) + chan->getName() + " :No topic is set");
 			else // Cas où il y a un topic
-				_sendTextToUser(NULL, user, "332 " + chan->getName() + " :" + topic);
+				_sendTextToUser(NULL, user, _composeRplMessage("332", user) + chan->getName() + " :" + topic);
 			_nameList(*chan, user);
 		}
 		else { // Cas où le channel n'existe pas encore
@@ -163,7 +167,7 @@ void Server::part(User * user, vector<string> & channels) {
 	vector<Channel>::iterator chan;
 
 	if (channels.empty()) {
-		_sendTextToUser(NULL, user, "461 PART :Not enough parameters");
+		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "PART :Not enough parameters");
 		return ;
 	}
 	for (it = channels.begin() ; it != channels.end() ; ++it) {
@@ -172,12 +176,12 @@ void Server::part(User * user, vector<string> & channels) {
 			;
 		if (chan->getName() == *it) { // Cas où on a trouvé le channel
 			if (!chan->deleteUserFromChannel(user)) { // On essaie de supprimer le user de le channel
-				_sendTextToUser(NULL, user, "442 " + *it + " :You're not on that channel");
+				_sendTextToUser(NULL, user, _composeRplMessage("442", user) + *it + " :You're not on that channel");
 				return ;
 			}
 		}
 		else { // Cas où on n'a pas trouvé le channel
-			_sendTextToUser(NULL, user, "403  " + *it + " :No such channel");
+			_sendTextToUser(NULL, user, _composeRplMessage("403", user) + *it + " :No such channel");
 			return ;
 		}
 	}
@@ -185,13 +189,13 @@ void Server::part(User * user, vector<string> & channels) {
 
 void Server::_userMode(User * user, User * targetUser, vector<string> & operands) {
 	if (operands.empty())
-		_sendTextToUser(NULL, user, "221 ");
+		_sendTextToUser(NULL, user, _composeRplMessage("221", user));
 	else
-		_sendTextToUser(NULL, user, "501 :Unknown MODE flag");
+		_sendTextToUser(NULL, user, _composeRplMessage("501", user) + "MODE :Unknown MODE flag");
 }
 
 void Server::_displayChannelMode(User * user, Channel * channel) {
-	string res = "324 " + user->getNick() + " +";
+	string res = _composeRplMessage("324", user) + user->getNick() + " +";
 	string params;
 
 	if (channel->isPrivate())
@@ -221,18 +225,18 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 	else if (modeString[0] == '-')
 		add = true;
 	else {
-		_sendTextToUser(NULL, user, string("472 ") + modeString[0] + " :is unknown mode char to me for " + channel->getName());
+		_sendTextToUser(NULL, user, _composeRplMessage("472", user) + modeString[0] + " :is unknown mode char to me for " + channel->getName());
 		return ;
 	}
 	for (int i = 1 ; i < modeString.size() ; ++i) {
 		if (modeString[i] == 'o') {
 			if (currOp->empty()) {
-				_sendTextToUser(NULL, user, "461 MODE :Not enough parameters");
+				_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "MODE :Not enough parameters");
 				return ;
 			}
 			User * targetUser = channel->getMember(*(currOp++));
 			if (!targetUser) {
-				_sendTextToUser(NULL, user, "441 " + *(currOp - 1) + " " + channel->getName() + " :They aren't on that channel");
+				_sendTextToUser(NULL, user, _composeRplMessage("441", user) + *(currOp - 1) + " " + channel->getName() + " :They aren't on that channel");
 				return ; 
 			}
 			if ((user == targetUser && !add) || channel->isUserChanOp(user)) {
@@ -242,12 +246,12 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 					channel->setUserChanOp(targetUser, false);
 			}
 			else {
-				_sendTextToUser(NULL, user, "482 " + channel->getName() + " :You're not channel operator");
+				_sendTextToUser(NULL, user, _composeRplMessage("482", user) + channel->getName() + " :You're not channel operator");
 				return ;
 			}
 		}
 		else if (!channel->isUserChanOp(user)) {
-			_sendTextToUser(NULL, user, "482 " + channel->getName() + " :You're not channel operator");
+			_sendTextToUser(NULL, user, _composeRplMessage("482", user) + channel->getName() + " :You're not channel operator");
 			return ;
 		}
 		else if (modeString[i] == 'p')
@@ -259,7 +263,7 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 		else if (modeString[i] == 'l') {
 			if (add) {
 				if (currOp->empty()) {
-					_sendTextToUser(NULL, user, "461 MODE :Not enough parameters");
+					_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "MODE :Not enough parameters");
 					return ;
 				}
 				stringstream ss;
@@ -274,7 +278,7 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 				channel->setMaxNbOfUsers(user, numeric_limits<int>::max());
 		}
 		else {
-			_sendTextToUser(NULL, user, string("472 ") + modeString[i] + " :is unknown mode char to me for " + channel->getName());
+			_sendTextToUser(NULL, user, _composeRplMessage("472", user) + modeString[i] + " :is unknown mode char to me for " + channel->getName());
 			return ;
 		}
 	}
@@ -285,7 +289,7 @@ void Server::mode(User * user, string requested_channel_or_user, vector<string> 
 	vector<Channel>::iterator requestedChannel;
 
 	if (requested_channel_or_user.empty()) {
-		_sendTextToUser(NULL, user, "461 MODE :Not enough parameters");
+		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "MODE :Not enough parameters");
 		return ;
 	}
 	for (requestedUser = _users.begin() ; requestedUser != _users.end() ; ++requestedUser)
@@ -303,14 +307,14 @@ void Server::mode(User * user, string requested_channel_or_user, vector<string> 
 		return ;
 	}
 	else {
-		_sendTextToUser(NULL, user, "401 " + requested_channel_or_user + ":No such nick/channel");
+		_sendTextToUser(NULL, user, _composeRplMessage("401", user) + requested_channel_or_user + ":No such nick/channel");
 		return ;
 	}
 }
 
 void Server::topic(User * user, string channel, string topic) {
 	if (channel.empty()) {
-		_sendTextToUser(NULL, user, "461 TOPIC :Not enough parameters");
+		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "TOPIC :Not enough parameters");
 		return ;
 	}
 	vector<Channel>::iterator it;
@@ -319,19 +323,19 @@ void Server::topic(User * user, string channel, string topic) {
 			break ;
 	}
 	if (it == _channels.end() || !it->isUserInChannel(user)) {
-		_sendTextToUser(NULL, user, "442 " + channel + " :You're not on that channel");
+		_sendTextToUser(NULL, user, _composeRplMessage("442", user) + channel + " :You're not on that channel");
 		return;
 	}
 	if (topic.empty()) {
 		if (it->getTopic().empty())
-			_sendTextToUser(NULL, user, "331 " + channel + " :No topic is set");
+			_sendTextToUser(NULL, user, _composeRplMessage("331", user) + channel + " :No topic is set");
 		else
-			_sendTextToUser(NULL, user, "332 " + channel + " :" + it->getTopic()); 
+			_sendTextToUser(NULL, user, _composeRplMessage("332", user) + channel + " :" + it->getTopic()); 
 	}
 	else if (it->setTopic(user, topic))
-		_sendTextToUser(NULL, user, "332 " + channel + " :" + it->getTopic());
+		_sendTextToUser(NULL, user, _composeRplMessage("332", user) + channel + " :" + it->getTopic());
 	else
-		_sendTextToUser(NULL, user, "482 " + channel + " :You're not channel operator");
+		_sendTextToUser(NULL, user, _composeRplMessage("482", user) + channel + " :You're not channel operator");
 }
 
 void Server::_listChannel(User const * user, Channel const & channel) {
@@ -342,7 +346,7 @@ void Server::_listChannel(User const * user, Channel const & channel) {
 			chanName = channel.getName();
 			topic = channel.getTopic();
 		}
-		_sendTextToUser(NULL, user, "322 " + chanName + ":" + topic); // RPL_LIST
+		_sendTextToUser(NULL, user, _composeRplMessage("322", user) + chanName + ":" + topic); // RPL_LIST
 	}
 }
 
@@ -350,7 +354,7 @@ void Server::list(User * user, vector<string> & channels) {
 	vector<string>::const_iterator it;
 	vector<Channel>::const_iterator chan;
 
-	_sendTextToUser(NULL, user, "321 Channel :Users Name"); // RPL_LISTSTART
+	_sendTextToUser(NULL, user, _composeRplMessage("321", user) + "Channel :Users Name"); // RPL_LISTSTART
 	if (channels.empty()) // Cas où la commande n'a pas d'argument
 		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 			_listChannel(user, *chan);
@@ -359,14 +363,14 @@ void Server::list(User * user, vector<string> & channels) {
 			for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 				if (chan->getName() == *it)
 					_listChannel(user, *chan);
-	_sendTextToUser(NULL, user, "323 :End of /LIST"); // RPL_LISTEND
+	_sendTextToUser(NULL, user, _composeRplMessage("323", user) + ":End of /LIST"); // RPL_LISTEND
 }
 
 void Server::kick(User * user, string channel, string kickee, string comment) {
 	vector<Channel>::iterator chan;
 
 	if (channel.empty() || kickee.empty()) {
-		_sendTextToUser(NULL, user, "461 KICK :Not enough parameters");
+		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "KICK :Not enough parameters");
 		return ;
 	}
 	// On cherche le channel dans la liste
@@ -375,13 +379,13 @@ void Server::kick(User * user, string channel, string kickee, string comment) {
 			break ;
 	// Cas où le channel n'est pas trouvé
 	if (chan == _channels.end()) {
-		_sendTextToUser(NULL, user, "403 " + channel + " :No such channel");
+		_sendTextToUser(NULL, user, _composeRplMessage("403", user) + channel + " :No such channel");
 		return ;
 	}
 	if (!chan->isUserChanOp(user))
-		_sendTextToUser(NULL, user, "482 " + channel + " :You're not channel operator");
+		_sendTextToUser(NULL, user, _composeRplMessage("482", user) + channel + " :You're not channel operator");
 	else if (!chan->deleteUserFromChannel(kickee))
-		_sendTextToUser(NULL, user, "441 " + kickee + " " + channel + " :They aren't on that channel");
+		_sendTextToUser(NULL, user, _composeRplMessage("441", user) + kickee + " " + channel + " :They aren't on that channel");
 	else { // Cas où la commande a réussi
 		vector<User>::const_iterator targetUser;
 		string kickMsg = "KICK " + channel + " " + kickee + (comment.empty()?"":" :" + comment);
@@ -396,11 +400,11 @@ void Server::kick(User * user, string channel, string kickee, string comment) {
 
 void Server::privmsg(User * user, vector<string> & recipients, string msg) {
 	if (recipients.empty()) {
-		_sendTextToUser(NULL, user, "411 :No recipient given (<PRIVMSG>)");
+		_sendTextToUser(NULL, user, _composeRplMessage("411", user) + ":No recipient given (<PRIVMSG>)");
 		return ;
 	}
 	if (msg.empty()) {
-		_sendTextToUser(NULL, user, "412 :No text to send");
+		_sendTextToUser(NULL, user, _composeRplMessage("412", user) + ":No text to send");
 		return ;
 	}
 	vector<string>::iterator it;

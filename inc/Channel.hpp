@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/18 17:48:22 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/21 14:47:18 by lgaudet-         ###   ########lyon.fr   */
 /*   Updated: 2022/07/08 16:06:49 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
@@ -47,9 +47,11 @@ public:
 	size_t			getNumberOfMembers() const;
 	vector<User*>	getMembers() const;
 	User *			getMember(string nick) const;
+	size_t			getMaxNbOfUser() const;
 	bool			canUserMessageChannel(User const * user) const; // see ERR_CANNOTSENDTOCHAN (404)
 	bool			isUserInChannel(User const * user) const;
 	bool			isUserChanOp(User const * user) const;
+	bool			isTopicSettableOnlyByOp() const;
 	void			setUserChanOp(User * user, bool value);
 	// Returns ton successful change
 	bool			addUser(User const * user);

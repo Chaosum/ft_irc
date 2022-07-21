@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/18 18:12:26 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/21 14:58:37 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,7 @@ void Server::join(User * user, vector<string> & requested_channels) {
 		else { // Cas où le channel n'existe pas encore
 			_channels.push_back(Channel(*it));
 			_channels.back().addUser(user);
-			_channels.back().makeUserOp(user);
+			_channels.back().setUserChanOp(user, true);
 			_nameList(_channels.back(), user);
 		}
 	}
@@ -190,14 +190,35 @@ void Server::_userMode(User * user, User * targetUser, vector<string> & operands
 		_sendTextToUser(NULL, user, "501 :Unknown MODE flag");
 }
 
+void Server::_displayChannelMode(User * user, Channel * channel) {
+	string res = "324 " + user->getNick() + " +";
+	string params;
+
+	if (channel->isPrivate())
+		res += 'p';
+	if (channel->isSecret())
+		res += 's';
+	if (channel->isTopicSettableOnlyByOp())
+		res += 't';
+	if (channel->getMaxNbOfUser() != numeric_limits<size_t>::max()) {
+		res += 'l';
+		params += channel->getMaxNbOfUser();
+	}
+	_sendTextToUser(NULL, user, res + params);
+}
+
 void Server::_channelMode(User * user, Channel * channel, vector<string> & operands) {
 	bool add;
 	string modeString = operands[0];
 	vector<string>::const_iterator currOp = operands.begin() + 1;
 
-	if (modeString[0] == '-')
+	if (operands.empty()) {
+		_displayChannelMode(user, channel);
+		return ;
+	}
+	else if (modeString[0] == '-')
 		add = false;
-	else if (modeString[0] == '+')
+	else if (modeString[0] == '-')
 		add = true;
 	else {
 		_sendTextToUser(NULL, user, string("472 ") + modeString[0] + " :is unknown mode char to me for " + channel->getName());
@@ -229,24 +250,12 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 			_sendTextToUser(NULL, user, "482 " + channel->getName() + " :You're not channel operator");
 			return ;
 		}
-		else if (modeString[i] == 'p') {
-			if (add)
-				channel->setPrivate(user, true);
-			else
-				channel->setPrivate(user, false);
-		}
-		else if (modeString[i] == 's') {
-			if (add)
-				channel->setSecret(user, true);
-			else
-				channel->setSecret(user, false);
-		}
-		else if (modeString[i] == 't') {
-			if (add)
-				channel->setTopicSettableOnlyByOp(user, true);
-			else
-				channel->setTopicSettableOnlyByOp(user, false);
-		}
+		else if (modeString[i] == 'p')
+				channel->setPrivate(user, add);
+		else if (modeString[i] == 's')
+				channel->setSecret(user, add);
+		else if (modeString[i] == 't')
+				channel->setTopicSettableOnlyByOp(user, add);
 		else if (modeString[i] == 'l') {
 			if (add) {
 				if (currOp->empty()) {
@@ -256,8 +265,10 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 				stringstream ss;
 				int requestedNumberOfUsers;
 				ss << *(currOp++);
-				ss >> requestedNumberOfUsers; // must perform error handling
-				channel->setMaxNbOfUsers(user, requestedNumberOfUsers);
+				if (!ss.fail()) {
+					ss >> requestedNumberOfUsers;
+					channel->setMaxNbOfUsers(user, requestedNumberOfUsers);
+				}
 			}
 			else
 				channel->setMaxNbOfUsers(user, numeric_limits<int>::max());

@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/21 19:01:54 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/21 19:11:47 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,8 +125,8 @@ void Server::quit(User * user, string msg) {
 	msg = msg.empty()? user->getNick() + " is quitting the server" : msg;
 	for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 		if (chan->isUserInChannel(user)) {
-			notice(user, chan->getName(), msg);
 			chan->deleteUserFromChannel(user);
+			_sendTextToChan(user, *chan, "QUIT :" + msg);
 		}
 }
 

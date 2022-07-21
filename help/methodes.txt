@@ -27,9 +27,6 @@ voir pour channel.cpp
 leto
 revoir sortie normale de
 -topic
--part
--join
--quit
 
 mode channel: o p s t l
 ERR_NEEDMOREPARAMS

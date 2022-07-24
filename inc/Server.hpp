@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/21 16:16:46 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/24 18:47:44 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ public:
 	Server	&operator=(Server const &rhs);
 	int		getPort(void) const;
 	string	getServerName(void) const;
+	string	getPassword(void) const;
 	vector<pollfd> getFds();
 	void	init_listen();
 	void	wait_for_event();

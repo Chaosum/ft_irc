@@ -26,6 +26,10 @@ voir pour channel.cpp
 
 leto
 
+envoyer message 421 quand commande inconnue
+Server::user : faire vérifs pour hostname et servername
+Server::pass : envoyer message 464 quand mot de passe faux
+
 mode channel: o p s t l
 ERR_NEEDMOREPARAMS
 ERR_USERNOTINCHANNEL

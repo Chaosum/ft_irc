@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/24 18:18:16 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/24 18:47:44 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void Server::pass(User * user, string password) {
 		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "PASS :Not enough parameters");
 	else {
 		user->setPasswd(password);
-		user->tryAuth();
+		user->tryAuth(this->_password);
 	}
 }
 
@@ -101,7 +101,7 @@ void Server::nick(User * user, string nickname) {
 		_sendTextToUser(NULL, user, _composeRplMessage("432", user) + nickname + " :Erroneus nickname");
 	else {
 		user->setNick(nickname);
-		user->tryAuth();
+		user->tryAuth(this->_password);
 	}
 }
 
@@ -115,7 +115,7 @@ void Server::user(User * user, string userName, string hostName, string serverNa
 		user->setUserName(userName);
 		user->setHostName(hostName);
 		user->setRealName(realName);
-		user->tryAuth();
+		user->tryAuth(this->_password);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/21 19:11:47 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/24 18:18:16 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -336,8 +336,11 @@ void Server::topic(User * user, string channel, string topic) {
 		else
 			_sendTextToUser(NULL, user, _composeRplMessage("332", user) + channel + " :" + it->getTopic()); 
 	}
-	else if (it->setTopic(user, topic))
-		_sendTextToChan(NULL, *it, _composeRplMessage("332", user) + channel + " :" + it->getTopic()); // à revoir, il fault remplacer ("332", user) pour que le message soit individualisé 
+	else if (it->setTopic(user, topic)) {
+		vector<User*>::iterator chanUser;
+		for (chanUser = it->getMembers().begin() ; chanUser != it->getMembers().end() ; ++chanUser)
+			_sendTextToUser(NULL, *chanUser, _composeRplMessage("332", *chanUser) + channel + " :" + it->getTopic());
+	}
 	else
 		_sendTextToUser(NULL, user, _composeRplMessage("482", user) + channel + " :You're not channel operator");
 }

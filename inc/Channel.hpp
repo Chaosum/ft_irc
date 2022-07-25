@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/21 14:47:18 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/25 18:09:15 by lgaudet-         ###   ########lyon.fr   */
 /*   Updated: 2022/07/08 16:06:49 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
@@ -16,6 +16,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <limits>
 #include "User.hpp"
 
 using namespace std;
@@ -33,14 +34,13 @@ private:
 	bool			_topicSettableOnlyByOp;
 
 	Channel();
-	Channel(Channel const &src);
-	bool isOp(User const * user);
+	Channel(const Channel & src);
 	
 public:
 	Channel(string name);
 	
 	~Channel();
-	Channel &operator=(Channel const &rhs);
+	Channel &operator=(const Channel & rhs);
 
 	string			getName() const;
 	string			getTopic() const;
@@ -54,7 +54,7 @@ public:
 	bool			isTopicSettableOnlyByOp() const;
 	void			setUserChanOp(User * user, bool value);
 	// Returns ton successful change
-	bool			addUser(User const * user);
+	bool			addUser(User * user);
 	bool			deleteUserFromChannel(User * user);
 	bool			deleteUserFromChannel(string nickname);
 	bool			setPrivate(User const * user, bool value);

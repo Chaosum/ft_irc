@@ -29,6 +29,7 @@ leto
 envoyer message 421 quand commande inconnue
 Server::user : faire vérifs pour hostname et servername
 Server::pass : envoyer message 464 quand mot de passe faux
+ajouter mode +n aux chan ?
 
 mode channel: o p s t l
 ERR_NEEDMOREPARAMS

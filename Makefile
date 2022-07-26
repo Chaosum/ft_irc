@@ -1,4 +1,4 @@
-SRCS							= ${addprefix srcs/, main.cpp Channel.cpp User.cpp Server.cpp} #Commands.cpp
+SRCS							= ${addprefix srcs/, main.cpp Channel.cpp User.cpp Server.cpp Commands.cpp}
 
 OBJS							= ${SRCS:.cpp=.o}
 

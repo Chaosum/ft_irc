@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 17:19:13 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/24 18:54:11 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/26 17:39:19 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,7 @@ User	&User::operator=(const User &rhs) {
 	return (*this);
 }
 
-pollfd	User::getPollFd(void) const
-{
-	return (this->_poll_fd);
-}
-
+pollfd	User::getPollFd(void) const { return (this->_poll_fd); }
 string User::getUserName() const { return _userName; }
 void User::setUserName(string name) { _userName = name; }
 string User::getRealName() const { return _realName; }

@@ -6,10 +6,10 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/25 18:09:15 by lgaudet-         ###   ########lyon.fr   */
-/*   Updated: 2022/07/08 16:06:49 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/26 17:40:59 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #pragma once
 
@@ -24,6 +24,15 @@ using namespace std;
 class Channel
 {
 private:
+User::User(pollfd newUser_pollfd): _userName(""), 
+								   _realName(""), 
+								   _nick(""),
+								   _suppliedPassword(""), 
+								   _isAuth(false) {
+	_poll_fd.events = newUser_pollfd.events;
+	_poll_fd.revents = newUser_pollfd.revents;
+	_poll_fd.fd = newUser_pollfd.fd;
+}
 	string			_name;
 	string			_topic;
 	vector<User*>	_members;
@@ -37,6 +46,8 @@ private:
 	Channel(const Channel & src);
 	
 public:
+	Channel();
+	Channel(Channel const &src);
 	Channel(string name);
 	
 	~Channel();

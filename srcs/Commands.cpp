@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/24 18:47:44 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/26 17:37:32 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,20 @@ bool	Server::_isNickAvailable(string nick) const{
 			return true;
 	return false;
 }
+
+bool	Server::_isValidNickname(string nick) const // a modif
+{
+	int i = 0;
+	while (nick[i])
+	{
+		if (isalnum(nick[i]))
+			i++;
+		else
+			return (false);
+	}
+	return (true);
+}
+
 
 void Server::pass(User * user, string password) {
 	if (user->isAuth())

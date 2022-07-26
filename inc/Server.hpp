@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/24 18:47:44 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/26 17:35:15 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <iostream>
 #include <limits>
 #include "Channel.hpp"
+#include "User.hpp"
 
 /* server contient:
 	la liste des channel
@@ -56,6 +57,8 @@ private:
 	void	_userMode(User * user, User * targetUser, vector<string> & operands);
 	void	_channelMode(User * user, Channel * channel, vector<string> & operands);
 	void	_displayChannelMode(User * user, Channel * channel);
+	bool	_command_exists(std::string line);
+
 	// Server commands
 	void pass(User * user, string password);
 	void nick(User * user, string nickname);
@@ -76,6 +79,7 @@ public:
 	Server(string server_name, int port, char *password);
 	~Server();
 
+	void	_send_txt(pollfd poll_fd, string text) const;
 	Server	&operator=(Server const &rhs);
 	int		getPort(void) const;
 	string	getServerName(void) const;
@@ -84,4 +88,6 @@ public:
 	void	init_listen();
 	void	wait_for_event();
 	void	msg_parse(char *buf, int index);
+	string	getNextWord(std::string line, int *i, std::string &tmp) const;
+	vector<std::string>	getNextVector(std::string line, int *i, int lastword);
 };

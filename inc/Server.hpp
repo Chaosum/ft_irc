@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/14 13:11:39 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/26 17:12:13 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ private:
 	bool	_isNickAvailable(string nick) const;
 	bool	_isValidNickname(string nick) const;
 	void	_listChannel(User const * user, Channel const & chan);
+	bool	_command_exists(std::string line);
 
 	// Server commands
 	void pass(User * user, string password);

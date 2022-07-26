@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/14 13:50:22 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/07/26 17:13:29 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,7 +186,7 @@ void	Server::msg_parse(char *buf, int index)
 	std::string	tmp;
 	std::vector<string> temp_vector;
 
-	while (buf[i])
+	while (buf[i]) //user verif isauth / avant ca verif si fonction existe
 	{
 		int tmp_i = 0;
 		while (buf[i] != '\n' && buf[i] != 0 & buf[i] != '\r')
@@ -209,13 +209,16 @@ void	Server::msg_parse(char *buf, int index)
 		{
 			user(&_users[index], getNextWord(line, &(tmp_i = 5), tmp),getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
 		}
+		if (!_command_exists(line))
+			printf("connard\n");
+		else if (!_users[index].isAuth())
+			printf("sakafoutr\n");
 		else if (line.compare(0, 5, "QUIT ") == 0)
 		{
 			quit(&_users[index], getNextWord(line, &tmp_i, tmp));
 		}
 		else if (line.compare(0, 5, "JOIN ") == 0)
 		{
-			
 			join(&_users[index], temp_vector = getNextVector(line, &(tmp_i = 5), 1));
 		}
 		else if (line.compare(0, 5, "PART ") == 0)
@@ -245,6 +248,43 @@ void	Server::msg_parse(char *buf, int index)
 		i++;
 		line.erase();
 	}
+}
+
+bool	Server::_command_exists(std::string line)
+{
+		if (line.compare(0, 5, "QUIT ") == 0)
+		{
+			return true;
+		}
+		else if (line.compare(0, 5, "JOIN ") == 0)
+		{
+			return true;
+		}
+		else if (line.compare(0, 5, "PART ") == 0)
+		{
+			return true;
+		}
+		else if (line.compare(0, 5, "MODE ") == 0)
+		{
+			return true;
+		}
+		else if (line.compare(0, 6, "TOPIC ") == 0)
+		{
+			return true;
+		}
+		else if (line.compare(0, 5, "LIST ") == 0)
+		{
+			return true;
+		}
+		else if (line.compare(0, 5, "KICK ") == 0)
+		{
+			return true;
+		}
+		else if (line.compare(0, 8, "PRIVMSG ") == 0)
+		{
+			return true;
+		}
+		return false;
 }
 
 void	Server::_send_txt(pollfd poll_fd, string text) const// couper en 512 et rajouter \r\n

@@ -30,6 +30,8 @@ envoyer message 421 quand commande inconnue
 Server::user : faire vérifs pour hostname et servername
 Server::pass : envoyer message 464 quand mot de passe faux
 ajouter mode +n aux chan ?
+message de non log si comm autre que nick pass user
+message 001 dans tryAuth
 
 mode channel: o p s t l
 ERR_NEEDMOREPARAMS

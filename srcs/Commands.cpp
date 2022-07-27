@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/24 18:47:44 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/27 17:09:42 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,36 @@ bool	Server::_isNickAvailable(string nick) const{
 		if (it->getNick() == nick)
 			return true;
 	return false;
+}
+
+bool Server::_isLetter(char c) const {
+	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+		return true;
+	return false;
+}
+
+bool Server::_isSpecialCharacter(char c) const {
+	if ((c >= 0x5B && c <= 60) || (c >= 0x7B && c <= 0x7D))
+		return true;
+	return false;
+}
+
+bool Server::_isDigit(char c) const {
+	if (c >= '0' && c <= '9')
+		return true;
+	return false;
+}
+
+bool Server::_isValidNickname(string nick) const {
+	if (nick.size() > 9 || nick.empty())
+		return false;
+	string::const_iterator it = nick.begin();
+	if (!(_isLetter(*it) || _isSpecialCharacter(*it)))
+		return false;
+	for (it = nick.begin() + 1 ; it != nick.end() ; ++it)
+		if (!(_isLetter(*it) || _isDigit(*it) || _isSpecialCharacter(*it) || *it == '-'))
+			return false;
+	return true;
 }
 
 void Server::pass(User * user, string password) {

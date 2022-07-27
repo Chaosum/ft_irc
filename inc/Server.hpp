@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/24 18:47:44 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/27 16:54:07 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,9 @@ private:
 	void	_sendTextToUser(User const * sender, User const * recipient, string text) const;
 	void	_nameList(Channel const & chan, User const * recipient) const;
 	bool	_isNickAvailable(string nick) const;
+	bool	_isLetter(char c) const;
+	bool	_isSpecialCharacter(char c) const;
+	bool	_isDigit(char c) const;
 	bool	_isValidNickname(string nick) const;
 	void	_listChannel(User const * user, Channel const & chan);
 	void	_userMode(User * user, User * targetUser, vector<string> & operands);

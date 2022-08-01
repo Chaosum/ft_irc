@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/27 15:16:29 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/01 15:35:08 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,7 +212,6 @@ void	Server::msg_parse(char *buf, int index)
 			getNextWord(line, &(tmp_i = 1), tmp);
 		if (line.compare(0, 5, "PASS ") == 0)
 		{
-			std::cout << "coucou" << std::endl;
 			pass(&_users[index], getNextWord(line, &(tmp_i = 5), tmp));
 		}
 		else if (line.compare(0, 5, "NICK ") == 0)
@@ -224,9 +223,9 @@ void	Server::msg_parse(char *buf, int index)
 			user(&_users[index], getNextWord(line, &(tmp_i = 5), tmp),getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
 		}
 		else if (!_command_exists(line))
-			printf("connard = %s\n", line.c_str());
+			unknownCommand(&_users[index], getNextWord(line, &tmp_i, tmp));
 		else if (!_users[index].isAuth())
-			printf("sakafoutr\n");
+			notLoggedIn(&_users[index]);
 		else if (line.compare(0, 5, "QUIT ") == 0) // :
 		{
 			quit(&_users[index], getNextWord(line, &tmp_i, tmp));

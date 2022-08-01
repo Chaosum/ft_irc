@@ -6,32 +6,32 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 17:19:13 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/29 18:49:10 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/01 14:56:58 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/User.hpp"
 
-User::User()
+User::User(): _userName(""), 
+			  _realName(""), 
+			  _nick(""),
+			  _suppliedPassword(""), 
+			  _isAuth(false)
 {
 }
 
-User::User(pollfd newUser_pollfd): _userName(""), 
-								   _realName(""), 
-								   _nick(""),
-								   _suppliedPassword(""), 
-								   _isAuth(false) {
+User::User(pollfd newUser_pollfd): User() {
 	_poll_fd.events = newUser_pollfd.events;
 	_poll_fd.revents = newUser_pollfd.revents;
 	_poll_fd.fd = newUser_pollfd.fd;
 }
 
-User::User(const User & src): _userName(""), 
-                       _realName(""), 
-                       _nick(""),
-                       _suppliedPassword(""), 
+User::User(const User & src): _userName(src._userName), 
+                       _realName(src._realName), 
+                       _nick(src._nick),
+                       _suppliedPassword(src._suppliedPassword), 
 					   _poll_fd(), 
-					   _isAuth(false) {
+					   _isAuth(src._isAuth) {
 	_poll_fd.events = src._poll_fd.events;
 	_poll_fd.revents = src._poll_fd.revents;
 	_poll_fd.fd = src._poll_fd.fd;

@@ -6,7 +6,7 @@
 /*   By: lgaudet- <lgaudet-@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/27 17:09:42 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/01 11:30:44 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,14 +111,28 @@ bool Server::_isValidNickname(string nick) const {
 	return true;
 }
 
+void	Server::_displayWelcomeMessage(User * user) {
+	_sendTextToUser(NULL, user, _composeRplMessage("001", user) +
+			"Welcome to the Internet Relay Network " + user->getNick() + "!" +
+			user->getUserName() + "@" + user->getHostName());
+	_sendTextToUser(NULL, user, _composeRplMessage("002", user) + "Your host is " +
+			this->_server_name + ", running version 0.0.0.42");
+	_sendTextToUser(NULL, user, _composeRplMessage("003", user) + "This server was created some time ago");
+	_sendTextToUser(NULL, user, _composeRplMessage("004", user) + this->_server_name +
+			" 0.0.0.42 r opstl");
+}
+
 void Server::pass(User * user, string password) {
 	if (user->isAuth())
 		_sendTextToUser(NULL, user, _composeRplMessage("462", user) + ":You may not reregister");
 	else if (password.empty())
 		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "PASS :Not enough parameters");
+	else if (password != this->_password)
+		_sendTextToUser(NULL, user, _composeRplMessage("464", user) + ":Password incorrect");
 	else {
 		user->setPasswd(password);
-		user->tryAuth(this->_password);
+		if (user->tryAuth(this->_password))
+			_displayWelcomeMessage(user);
 	}
 }
 
@@ -131,7 +145,8 @@ void Server::nick(User * user, string nickname) {
 		_sendTextToUser(NULL, user, _composeRplMessage("432", user) + nickname + " :Erroneus nickname");
 	else {
 		user->setNick(nickname);
-		user->tryAuth(this->_password);
+		if (user->tryAuth(this->_password))
+			_displayWelcomeMessage(user);
 	}
 }
 
@@ -142,10 +157,14 @@ void Server::user(User * user, string userName, string hostName, string serverNa
 	else if (userName.empty() || hostName.empty() || serverName.empty() || realName.empty())
 		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "PASS :Not enough parameters");
 	else {
+		if (hostName == "*")
+			user->setHostName("localhost");
+		else
+			user->setHostName(hostName);
 		user->setUserName(userName);
-		user->setHostName(hostName);
 		user->setRealName(realName);
-		user->tryAuth(this->_password);
+		if (user->tryAuth(this->_password))
+			_displayWelcomeMessage(user);
 	}
 }
 
@@ -470,4 +489,12 @@ void Server::notice(User * user, string recipient, string msg) {
 				break;
 			}
 		}
+}
+
+void Server::unknownCommand(User * user, string commandName) {
+	_sendTextToUser(NULL, user, _composeRplMessage("421", user) + commandName + " :Unknown command");
+}
+
+void Server::notLoggedIn(User * user) {
+	_sendTextToUser(NULL, user, _composeRplMessage("451", user) + ":You have not registered");
 }

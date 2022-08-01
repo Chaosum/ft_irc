@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/24 18:53:48 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/29 18:49:21 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,5 +55,5 @@ public:
 	string	getSuppliedPasswd(void) const;
 	void	setPasswd(string passwd);
 	bool	isAuth() const;
-	void	tryAuth(string serverPassword);
+	bool	tryAuth(string serverPassword);
 };

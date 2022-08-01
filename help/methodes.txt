@@ -26,12 +26,7 @@ voir pour channel.cpp
 
 leto
 
-envoyer message 421 quand commande inconnue
-Server::user : faire vérifs pour hostname et servername
-Server::pass : envoyer message 464 quand mot de passe faux
 ajouter mode +n aux chan ?
-message de non log si comm autre que nick pass user
-message 001 dans tryAuth
 
 mode channel: o p s t l
 ERR_NEEDMOREPARAMS
@@ -40,6 +35,14 @@ RPL_CHANNELMODEIS
 RPL_UNIQOPIS
 ERR_CHANOPRIVSNEEDED
 ERR_UNKNOWNMODE
+415    ERR_BADMASK
+              "<mask> :Bad Server/host mask"
+451     ERR_NOTREGISTERED
+			":You have not registered"
+
+		- Returned by the server to indicate that the client
+		must be registered before the server will allow it
+		to be parsed in detail.
 
 441    ERR_USERNOTINCHANNEL
               "<nick> <channel> :They aren't on that channel"

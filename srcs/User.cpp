@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 17:19:13 by mservage          #+#    #+#             */
-/*   Updated: 2022/07/24 18:54:11 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/07/29 18:49:10 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,10 @@ void User::setNick(string nick) { _nick = nick; }
 string User::getSuppliedPasswd() const { return _suppliedPassword; }
 void User::setPasswd(string passwd) { _suppliedPassword = passwd; }
 bool User::isAuth() const { return _isAuth; }
-void User::tryAuth(string serverPassword) {
-	if (!_userName.empty() && !_realName.empty() && !_nick.empty() && serverPassword == _suppliedPassword)
+bool User::tryAuth(string serverPassword) {
+	if (!_userName.empty() && !_realName.empty() && !_nick.empty() && serverPassword == _suppliedPassword) {
 		_isAuth = true;
+		return true;
+	}
+	return false;
 }

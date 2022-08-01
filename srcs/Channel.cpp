@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:25:32 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/26 17:38:16 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/01 15:48:50 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,13 @@ Channel::Channel(const Channel & src) {
 	this->_topicSettableOnlyByOp = src._topicSettableOnlyByOp;
 }
 
-Channel::Channel(string name): Channel() {
+Channel::Channel(string name): _topic(""),
+							   _members(vector<User*>()),
+							   _chanOps(vector<User*>()),
+							   _maxNbOfUsers(numeric_limits<int>::max()),
+							   _isPrivate(false),
+							   _isSecret(false),
+							   _topicSettableOnlyByOp(false) {
 	this->_name = name;
 }
 	
@@ -60,7 +66,10 @@ size_t Channel::getMaxNbOfUser() const { return _maxNbOfUsers; }
 bool Channel::isTopicSettableOnlyByOp() const { return _topicSettableOnlyByOp; }
 bool Channel::isSecret() const { return _isSecret; }
 bool Channel::isPrivate() const { return _isPrivate; }
-bool Channel::canUserMessageChannel(User const * user) const { return true; } // see ERR_CANNOTSENDTOCHAN (404)
+bool Channel::canUserMessageChannel(User const * user) const {  // see ERR_CANNOTSENDTOCHAN (404)
+	(void)user;
+	return true;
+}
 
 User * Channel::getMember(string nick) const {
 	vector<User*>::const_iterator it;

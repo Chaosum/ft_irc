@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/01 15:08:14 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/01 16:02:20 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,8 +77,8 @@ bool	Server::_isNickAvailable(string nick) const{
 	vector<User>::const_iterator it;
 	for (it = _users.begin() ; it != _users.end() ; ++it)
 		if (it->getNick() == nick)
-			return true;
-	return false;
+			return false;
+	return true;
 }
 
 bool Server::_isLetter(char c) const {

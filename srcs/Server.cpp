@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/01 15:35:08 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/01 16:20:42 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -313,11 +313,12 @@ void	Server::_send_txt(pollfd poll_fd, string text) const// couper en 512 et raj
 	string prefixe;
 	string dest;
 	int p_size = 0;
-	if (text[0] == ':')
+	if (text[0] == ':') {
+		p_size = 1;
 		getNextWord(text, &p_size, prefixe);
+		prefixe = ":" + prefixe;
+	}
 	int i = p_size;
-	while(text[i] == ' ' && text[i] != 0)
-		i++;
 	while(text[i] != 0)
 	{
 		dest = dest + prefixe;

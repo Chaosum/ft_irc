@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 17:19:13 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/01 15:34:56 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/01 15:47:34 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,11 @@ User::User(): _userName(""),
 {
 }
 
-User::User(pollfd newUser_pollfd): User() {
+User::User(pollfd newUser_pollfd): _userName(""), 
+								  _realName(""), 
+								  _nick(""),
+								  _suppliedPassword(""), 
+								  _isAuth(false) {
 	_poll_fd.events = newUser_pollfd.events;
 	_poll_fd.revents = newUser_pollfd.revents;
 	_poll_fd.fd = newUser_pollfd.fd;

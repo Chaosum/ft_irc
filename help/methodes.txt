@@ -26,8 +26,6 @@ voir pour channel.cpp
 
 leto
 
-err 464 deux espaces
-message 001 renvoyé quand changement de nick
 ajouter mode +n aux chan ?
 
 mode channel: o p s t l

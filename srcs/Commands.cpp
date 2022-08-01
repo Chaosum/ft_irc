@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/01 16:02:20 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/01 16:50:30 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ string Server::_composePrefix(User const * sender) const{
 }
 
 string Server::_composeRplMessage(string errCode, User const * user) const {
-	return errCode + " " + user->getNick() + " ";
+	return errCode + " " + (user->getNick().empty()? "" : user->getNick() + " ");
 }
 
 void Server::_sendPrivmsgToChan(User const * sender, string channel, string text) const{
@@ -145,7 +145,7 @@ void Server::nick(User * user, string nickname) {
 		_sendTextToUser(NULL, user, _composeRplMessage("432", user) + nickname + " :Erroneus nickname");
 	else {
 		user->setNick(nickname);
-		if (user->tryAuth(this->_password))
+		if (!user->isAuth() && user->tryAuth(this->_password))
 			_displayWelcomeMessage(user);
 	}
 }

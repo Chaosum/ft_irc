@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/01 16:02:20 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/01 17:37:36 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,7 +207,7 @@ void Server::join(User * user, vector<string> & requested_channels) {
 			_channels.push_back(Channel(*it));
 			_channels.back().addUser(user);
 			_channels.back().setUserChanOp(user, true);
-			_sendTextToUser(NULL, user, _composeRplMessage("331", user) + chan->getName() + " :No topic is set");
+			_sendTextToUser(NULL, user, _composeRplMessage("331", user) + _channels.back().getName() + " :No topic is set");
 			_nameList(_channels.back(), user);
 		}
 	}

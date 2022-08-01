@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/01 16:20:42 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/01 17:33:03 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,7 +232,7 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (line.compare(0, 5, "JOIN ") == 0)
 		{
-			join(&_users[index], temp_vector = getNextVector(line, &(tmp_i = 5), 1));
+			join(&_users[index], temp_vector = getNextVector(line, &(tmp_i = 5), 0));
 		}
 		else if (line.compare(0, 5, "PART ") == 0) // :
 		{

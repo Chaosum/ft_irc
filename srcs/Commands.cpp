@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/07/26 17:37:32 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/01 15:05:36 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,28 +81,58 @@ bool	Server::_isNickAvailable(string nick) const{
 	return false;
 }
 
-bool	Server::_isValidNickname(string nick) const // a modif
-{
-	int i = 0;
-	while (nick[i])
-	{
-		if (isalnum(nick[i]))
-			i++;
-		else
-			return (false);
-	}
-	return (true);
+bool Server::_isLetter(char c) const {
+	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+		return true;
+	return false;
 }
 
+bool Server::_isSpecialCharacter(char c) const {
+	if ((c >= 0x5B && c <= 60) || (c >= 0x7B && c <= 0x7D))
+		return true;
+	return false;
+}
+
+bool Server::_isDigit(char c) const {
+	if (c >= '0' && c <= '9')
+		return true;
+	return false;
+}
+
+bool Server::_isValidNickname(string nick) const {
+	if (nick.size() > 9 || nick.empty())
+		return false;
+	string::const_iterator it = nick.begin();
+	if (!(_isLetter(*it) || _isSpecialCharacter(*it)))
+		return false;
+	for (it = nick.begin() + 1 ; it != nick.end() ; ++it)
+		if (!(_isLetter(*it) || _isDigit(*it) || _isSpecialCharacter(*it) || *it == '-'))
+			return false;
+	return true;
+}
+
+void	Server::_displayWelcomeMessage(User * user) {
+	_sendTextToUser(NULL, user, _composeRplMessage("001", user) +
+			"Welcome to the Internet Relay Network " + user->getNick() + "!" +
+			user->getUserName() + "@" + user->getHostName());
+	_sendTextToUser(NULL, user, _composeRplMessage("002", user) + "Your host is " +
+			this->_server_name + ", running version 0.0.0.42");
+	_sendTextToUser(NULL, user, _composeRplMessage("003", user) + "This server was created some time ago");
+	_sendTextToUser(NULL, user, _composeRplMessage("004", user) + this->_server_name +
+			" 0.0.0.42 r opstl");
+}
 
 void Server::pass(User * user, string password) {
 	if (user->isAuth())
 		_sendTextToUser(NULL, user, _composeRplMessage("462", user) + ":You may not reregister");
 	else if (password.empty())
 		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "PASS :Not enough parameters");
+	else if (password != this->_password)
+		_sendTextToUser(NULL, user, _composeRplMessage("464", user) + ":Password incorrect");
 	else {
 		user->setPasswd(password);
-		user->tryAuth(this->_password);
+		if (user->tryAuth(this->_password))
+			_displayWelcomeMessage(user);
 	}
 }
 
@@ -115,7 +145,8 @@ void Server::nick(User * user, string nickname) {
 		_sendTextToUser(NULL, user, _composeRplMessage("432", user) + nickname + " :Erroneus nickname");
 	else {
 		user->setNick(nickname);
-		user->tryAuth(this->_password);
+		if (user->tryAuth(this->_password))
+			_displayWelcomeMessage(user);
 	}
 }
 
@@ -126,10 +157,14 @@ void Server::user(User * user, string userName, string hostName, string serverNa
 	else if (userName.empty() || hostName.empty() || serverName.empty() || realName.empty())
 		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "PASS :Not enough parameters");
 	else {
+		if (hostName == "*")
+			user->setHostName("localhost");
+		else
+			user->setHostName(hostName);
 		user->setUserName(userName);
-		user->setHostName(hostName);
 		user->setRealName(realName);
-		user->tryAuth(this->_password);
+		if (user->tryAuth(this->_password))
+			_displayWelcomeMessage(user);
 	}
 }
 
@@ -454,4 +489,12 @@ void Server::notice(User * user, string recipient, string msg) {
 				break;
 			}
 		}
+}
+
+void Server::unknownCommand(User * user, string commandName) {
+	_sendTextToUser(NULL, user, _composeRplMessage("421", user) + commandName + " :Unknown command");
+}
+
+void Server::notLoggedIn(User * user) {
+	_sendTextToUser(NULL, user, _composeRplMessage("451", user) + ":You have not registered");
 }

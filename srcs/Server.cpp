@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/01 17:33:03 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/03 15:52:32 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 #define MAXUSER 666
 
-Server::Server(): _password("blabla")
+Server::Server(): _password("blabla"), _port(0)
 {
 }
 
@@ -200,6 +200,7 @@ void	Server::msg_parse(char *buf, int index)
 	std::string	line;
 	std::string	tmp;
 	std::vector<string> temp_vector;
+	std::string command;
 	while (buf[i] != 0) //dernier argument a refaire en verifiant les ':'
 	{
 		int tmp_i = 0;
@@ -209,99 +210,106 @@ void	Server::msg_parse(char *buf, int index)
 			i++;
 		}
 		if (line[0] == ':')
+		{
 			getNextWord(line, &(tmp_i = 1), tmp);
-		if (line.compare(0, 5, "PASS ") == 0)
-		{
-			pass(&_users[index], getNextWord(line, &(tmp_i = 5), tmp));
+			command = getNextWord(line, &tmp_i, tmp);
 		}
-		else if (line.compare(0, 5, "NICK ") == 0)
+		else
 		{
-			nick(&_users[index], getNextWord(line, &(tmp_i = 5), tmp));
+			command = getNextWord(line, &tmp_i, tmp);
 		}
-		else if (line.compare(0, 5, "USER ") == 0) // :
+		if (command == "PASS")
 		{
-			user(&_users[index], getNextWord(line, &(tmp_i = 5), tmp),getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
+			pass(&_users[index], getNextWord(line, &tmp_i, tmp));
 		}
-		else if (!_command_exists(line))
-			unknownCommand(&_users[index], getNextWord(line, &tmp_i, tmp));
+		else if (command == "NICK")
+		{
+			nick(&_users[index], getNextWord(line, &tmp_i, tmp));
+		}
+		else if (command == "USER") // :
+		{
+			user(&_users[index], getNextWord(line, &tmp_i, tmp),getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
+		}
+		else if (!_command_exists(command))
+			unknownCommand(&_users[index], command);
 		else if (!_users[index].isAuth())
 			notLoggedIn(&_users[index]);
-		else if (line.compare(0, 5, "QUIT ") == 0) // :
+		else if (command == "QUIT") // :
 		{
 			quit(&_users[index], getNextWord(line, &tmp_i, tmp));
 		}
-		else if (line.compare(0, 5, "JOIN ") == 0)
+		else if (command == "JOIN")
 		{
-			join(&_users[index], temp_vector = getNextVector(line, &(tmp_i = 5), 0));
+			join(&_users[index], temp_vector = getNextVector(line, &tmp_i, 0));
 		}
-		else if (line.compare(0, 5, "PART ") == 0) // :
+		else if (command == "PART") // :
 		{
-			part(&_users[index], temp_vector = getNextVector(line, &(tmp_i = 5), 1), getNextWord(line, &tmp_i, tmp));
+			part(&_users[index], temp_vector = getNextVector(line, &tmp_i, 1), getNextWord(line, &tmp_i, tmp));
 		}
-		else if (line.compare(0, 5, "MODE ") == 0)
+		else if (command == "MODE")
 		{
-			mode(&_users[index], getNextWord(line, &(tmp_i = 5), tmp), temp_vector = getNextVector(line, &tmp_i, 0));
+			mode(&_users[index], getNextWord(line, &tmp_i, tmp), temp_vector = getNextVector(line, &tmp_i, 0));
 		}
-		else if (line.compare(0, 6, "TOPIC ") == 0) // :
+		else if (command == "TOPIC") // :
 		{
-			topic(&_users[index], getNextWord(line, &(tmp_i = 6), tmp), getNextWord(line, &tmp_i, tmp));
+			topic(&_users[index], getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
 		}
-		else if (line.compare(0, 5, "LIST ") == 0)
+		else if (command == "LIST")
 		{
-			list(&_users[index], temp_vector = getNextVector(line, &(tmp_i = 5), 1));
+			list(&_users[index], temp_vector = getNextVector(line, &tmp_i, 1));
 		}
-		else if (line.compare(0, 5, "KICK ") == 0) // :
+		else if (command == "KICK") // :
 		{
-			kick(&_users[index], getNextWord(line, &(tmp_i = 5), tmp), getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
+			kick(&_users[index], getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
 		}
-		else if (line.compare(0, 8, "PRIVMSG ") == 0) // :
+		else if (command == "PRIVMSG") // :
 		{
-			privmsg(&_users[index],temp_vector = getNextVector(line, &(tmp_i = 8), 1), getNextWord(line, &tmp_i, tmp));
+			privmsg(&_users[index],temp_vector = getNextVector(line, &tmp_i, 1), getNextWord(line, &tmp_i, tmp));
 		}
-		else if (line.compare(0, 7, "NOTICE ") == 0)
+		else if (command == "NOTICE")
 		{
-			notice(&_users[index], getNextWord(line, &(tmp_i = 7), tmp), getNextWord(line, &tmp_i, tmp));
+			notice(&_users[index], getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
 		}
 		i = i + 2;
 		line.erase();
 	}
 }
 
-bool	Server::_command_exists(std::string line)
+bool	Server::_command_exists(std::string command)
 {
-		if (line.compare(0, 5, "QUIT ") == 0)
+		if (command == "QUIT")
 		{
 			return true;
 		}
-		else if (line.compare(0, 5, "JOIN ") == 0)
+		else if (command == "JOIN")
 		{
 			return true;
 		}
-		else if (line.compare(0, 5, "PART ") == 0)
+		else if (command == "PART")
 		{
 			return true;
 		}
-		else if (line.compare(0, 5, "MODE ") == 0)
+		else if (command == "MODE")
 		{
 			return true;
 		}
-		else if (line.compare(0, 6, "TOPIC ") == 0)
+		else if (command == "TOPIC")
 		{
 			return true;
 		}
-		else if (line.compare(0, 5, "LIST ") == 0)
+		else if (command == "LIST")
 		{
 			return true;
 		}
-		else if (line.compare(0, 5, "KICK ") == 0)
+		else if (command == "KICK")
 		{
 			return true;
 		}
-		else if (line.compare(0, 8, "PRIVMSG ") == 0)
+		else if (command == "PRIVMSG")
 		{
 			return true;
 		}
-		else if (line.compare(0, 7, "NOTICE ") == 0)
+		else if (command == "NOTICE")
 		{
 			return true;
 		}

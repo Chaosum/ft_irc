@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/03 15:52:32 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/03 16:03:42 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,7 @@ std::string	Server::getNextWord(std::string line, int *i, std::string &tmp) cons
 	}
 	if (line[*i] == ':')
 	{
+		*i = *i + 1;
 		while (line[*i] != '\r' && line[*i] != '\n' && line[*i] != 0)
 		{
 			tmp = tmp + line[*i];

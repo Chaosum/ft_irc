@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/07/27 14:11:35 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/03 16:52:47 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ public:
 	string			getName() const;
 	string			getTopic() const;
 	size_t			getNumberOfMembers() const;
-	vector<User*>	getMembers() const;
+	const vector<User*>&	getMembers() const;
 	User *			getMember(string nick) const;
 	size_t			getMaxNbOfUser() const;
 	bool			canUserMessageChannel(User const * user) const; // see ERR_CANNOTSENDTOCHAN (404)

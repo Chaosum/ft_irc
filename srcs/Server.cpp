@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/03 16:13:13 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/03 18:01:36 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,7 +187,7 @@ std::vector<std::string>	Server::getNextVector(std::string line, int *i, int las
 		}
 		dest.push_back(tmp);
 	}
-	if (lastword)
+	if (lastword && dest.size())
 	{
 		*i = i_save;
 		dest.erase(dest.end() - 1);
@@ -257,7 +257,7 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (command == "LIST")
 		{
-			list(&_users[index], temp_vector = getNextVector(line, &tmp_i, 1));
+			list(&_users[index], temp_vector = getNextVector(line, &tmp_i, 0));
 		}
 		else if (command == "KICK") // :
 		{

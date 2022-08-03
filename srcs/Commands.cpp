@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/01 17:37:36 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/03 16:54:42 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -386,7 +386,7 @@ void Server::topic(User * user, string channel, string topic) {
 			_sendTextToUser(NULL, user, _composeRplMessage("332", user) + channel + " :" + it->getTopic()); 
 	}
 	else if (it->setTopic(user, topic)) {
-		vector<User*>::iterator chanUser;
+		vector<User*>::const_iterator chanUser;
 		for (chanUser = it->getMembers().begin() ; chanUser != it->getMembers().end() ; ++chanUser)
 			_sendTextToUser(NULL, *chanUser, _composeRplMessage("332", *chanUser) + channel + " :" + it->getTopic());
 	}

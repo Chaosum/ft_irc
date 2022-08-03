@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/01 15:02:41 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/03 16:12:04 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,6 @@ public:
 	void	init_listen();
 	void	wait_for_event();
 	void	msg_parse(char *buf, int index);
-	string	getNextWord(std::string line, int *i, std::string &tmp) const;
+	string	getNextWord(std::string line, int *i) const;
 	vector<std::string>	getNextVector(std::string line, int *i, int lastword);
 };

@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/03 16:03:42 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/03 16:13:13 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,9 +140,9 @@ void	Server::wait_for_event()
 	}
 }
 
-std::string	Server::getNextWord(std::string line, int *i, std::string &tmp) const
+std::string	Server::getNextWord(std::string line, int *i) const
 {
-	tmp.clear();
+	std::string tmp;
 	while (line[*i] == ' ')
 	{
 		*i = *i + 1;
@@ -199,7 +199,7 @@ void	Server::msg_parse(char *buf, int index)
 {
 	int i = 0;
 	std::string	line;
-	std::string	tmp;
+//	std::string	tmp;
 	std::vector<string> temp_vector;
 	std::string command;
 	while (buf[i] != 0) //dernier argument a refaire en verifiant les ':'
@@ -212,24 +212,24 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		if (line[0] == ':')
 		{
-			getNextWord(line, &(tmp_i = 1), tmp);
-			command = getNextWord(line, &tmp_i, tmp);
+			getNextWord(line, &(tmp_i = 1));
+			command = getNextWord(line, &tmp_i);
 		}
 		else
 		{
-			command = getNextWord(line, &tmp_i, tmp);
+			command = getNextWord(line, &tmp_i);
 		}
 		if (command == "PASS")
 		{
-			pass(&_users[index], getNextWord(line, &tmp_i, tmp));
+			pass(&_users[index], getNextWord(line, &tmp_i));
 		}
 		else if (command == "NICK")
 		{
-			nick(&_users[index], getNextWord(line, &tmp_i, tmp));
+			nick(&_users[index], getNextWord(line, &tmp_i));
 		}
 		else if (command == "USER") // :
 		{
-			user(&_users[index], getNextWord(line, &tmp_i, tmp),getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
+			user(&_users[index], getNextWord(line, &tmp_i),getNextWord(line, &tmp_i), getNextWord(line, &tmp_i), getNextWord(line, &tmp_i));
 		}
 		else if (!_command_exists(command))
 			unknownCommand(&_users[index], command);
@@ -237,7 +237,7 @@ void	Server::msg_parse(char *buf, int index)
 			notLoggedIn(&_users[index]);
 		else if (command == "QUIT") // :
 		{
-			quit(&_users[index], getNextWord(line, &tmp_i, tmp));
+			quit(&_users[index], getNextWord(line, &tmp_i));
 		}
 		else if (command == "JOIN")
 		{
@@ -245,15 +245,15 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (command == "PART") // :
 		{
-			part(&_users[index], temp_vector = getNextVector(line, &tmp_i, 1), getNextWord(line, &tmp_i, tmp));
+			part(&_users[index], temp_vector = getNextVector(line, &tmp_i, 1), getNextWord(line, &tmp_i));
 		}
 		else if (command == "MODE")
 		{
-			mode(&_users[index], getNextWord(line, &tmp_i, tmp), temp_vector = getNextVector(line, &tmp_i, 0));
+			mode(&_users[index], getNextWord(line, &tmp_i), temp_vector = getNextVector(line, &tmp_i, 0));
 		}
 		else if (command == "TOPIC") // :
 		{
-			topic(&_users[index], getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
+			topic(&_users[index], getNextWord(line, &tmp_i), getNextWord(line, &tmp_i));
 		}
 		else if (command == "LIST")
 		{
@@ -261,15 +261,15 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (command == "KICK") // :
 		{
-			kick(&_users[index], getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
+			kick(&_users[index], getNextWord(line, &tmp_i), getNextWord(line, &tmp_i), getNextWord(line, &tmp_i));
 		}
 		else if (command == "PRIVMSG") // :
 		{
-			privmsg(&_users[index],temp_vector = getNextVector(line, &tmp_i, 1), getNextWord(line, &tmp_i, tmp));
+			privmsg(&_users[index],temp_vector = getNextVector(line, &tmp_i, 1), getNextWord(line, &tmp_i));
 		}
 		else if (command == "NOTICE")
 		{
-			notice(&_users[index], getNextWord(line, &tmp_i, tmp), getNextWord(line, &tmp_i, tmp));
+			notice(&_users[index], getNextWord(line, &tmp_i), getNextWord(line, &tmp_i));
 		}
 		i = i + 2;
 		line.erase();
@@ -324,7 +324,7 @@ void	Server::_send_txt(pollfd poll_fd, string text) const// couper en 512 et raj
 	int p_size = 0;
 	if (text[0] == ':') {
 		p_size = 1;
-		getNextWord(text, &p_size, prefixe);
+		prefixe = getNextWord(text, &p_size);
 		prefixe = ":" + prefixe;
 	}
 	int i = p_size;

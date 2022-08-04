@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/04 15:03:42 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/04 15:39:30 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,7 @@ void Server::join(User * user, vector<string> & requested_channels) {
 				_sendTextToUser(NULL, user, _composeRplMessage("471", user) + chan->getName() + " :Cannot join channel (+l)");
 				return ;
 			}
-			_sendTextToChan(user, *chan, "JOIN " + chan->getName());
+			_sendTextToChan(user, *chan, _composePrefix(user) + "JOIN " + chan->getName());
 			topic = chan->getTopic();
 			if (topic.empty()) // Cas où le topic est vide
 				_sendTextToUser(NULL, user, _composeRplMessage("331", user) + chan->getName() + " :No topic is set");

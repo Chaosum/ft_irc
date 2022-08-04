@@ -26,6 +26,10 @@ voir pour channel.cpp
 
 leto
 
+PRIVMSG envois a tout le monde meme a celui qui a ecrit le msg
+interdire création de chan commencant par @
+channel commence par # ou & ou + ou !
+
 err 464 deux espaces
 message 001 renvoyé quand changement de nick
 ajouter mode +n aux chan ?

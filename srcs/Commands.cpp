@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/04 16:15:57 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/04 16:18:12 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@ void Server::nick(User * user, string nickname) {
 	if (nickname.empty())
 		_sendTextToUser(NULL, user, _composeRplMessage("431", user) + ":No nickname given");
 	else if (!_isNickAvailable(nickname))
-		_sendTextToUser(NULL, user, _composeRplMessage("443", user) + nickname + " :Nickname is already in use");
+		_sendTextToUser(NULL, user, _composeRplMessage("433", user) + nickname + " :Nickname is already in use");
 	else if (!_isValidNickname(nickname))
 		_sendTextToUser(NULL, user, _composeRplMessage("432", user) + nickname + " :Erroneus nickname");
 	else {
@@ -199,7 +199,7 @@ void Server::join(User * user, vector<string> & requested_channels) {
 		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 			if (chan->getName() == *it)
 				break;
-		_sendTextToUser(user, user, "JOIN :" + *it);
+		_sendTextToUser(user, user, "JOIN " + *it);
 		if (chan != _channels.end()) { // Cas où le channel existe
 			// On vérifie si le user est déjà dans le channel
 			for (user_it = chan->getMembers().begin() ; user_it != chan->getMembers().end() ; ++user_it)
@@ -253,7 +253,8 @@ void Server::part(User * user, vector<string> & channels, string partMessage) {
 				_sendTextToUser(NULL, user, _composeRplMessage("442", user) + *it + " :You're not on that channel");
 				return ;
 			}
-			_sendTextToChan(user, *chan, "PART " + chan->getName() + " " + partMessage);
+			_sendTextToUser(user, user, "PART " + chan->getName() + " :" + partMessage);
+			_sendTextToChan(user, *chan, _composePrefix(user) + "PART " + chan->getName() + " :" + partMessage);
 		}
 		else { // Cas où on n'a pas trouvé le channel
 			_sendTextToUser(NULL, user, _composeRplMessage("403", user) + *it + " :No such channel");

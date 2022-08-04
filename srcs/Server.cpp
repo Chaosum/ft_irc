@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/04 14:45:31 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/04 15:30:12 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,7 +167,7 @@ std::string	Server::getNextWord(std::string line, int *i) const
 	return (tmp);
 }
 
-std::vector<std::string>	Server::getNextVector(std::string line, int *i, int lastword)
+std::vector<std::string>	Server::getNextVector(std::string line, int *i)
 {
 	std::vector<std::string> dest;
 	std::string tmp;
@@ -186,11 +186,6 @@ std::vector<std::string>	Server::getNextVector(std::string line, int *i, int las
 			*i = *i + 1;
 		}
 		dest.push_back(tmp);
-	}
-	if (lastword && dest.size())
-	{
-		*i = i_save;
-		dest.erase(dest.end() - 1);
 	}
 	return (dest);
 }
@@ -244,16 +239,22 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (command == "JOIN")
 		{
-			join(&_users[index], temp_vector = getNextVector(line, &tmp_i, 0));
+			join(&_users[index], temp_vector = getNextVector(line, &tmp_i));// virer dernier param
+		}
+		else if (command == "PING")
+		{
+			pong(&_users[index], getNextWord(line, &tmp_i));
 		}
 		else if (command == "PART") // :
 		{
-			part(&_users[index], temp_vector = getNextVector(line, &tmp_i, 1), getNextWord(line, &tmp_i));
+			temp_vector = getNextVector(line, &tmp_i);
+			std::string part_msg = getNextWord(line, &tmp_i);
+			part(&_users[index], temp_vector, part_msg);
 		}
 		else if (command == "MODE")
 		{
 			std::string requested_channel_or_user = getNextWord(line, &tmp_i);
-			mode(&_users[index], requested_channel_or_user, temp_vector = getNextVector(line, &tmp_i, 0));
+			mode(&_users[index], requested_channel_or_user, temp_vector = getNextVector(line, &tmp_i));
 		}
 		else if (command == "TOPIC") // :
 		{
@@ -263,7 +264,7 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (command == "LIST")
 		{
-			list(&_users[index], temp_vector = getNextVector(line, &tmp_i, 0));
+			list(&_users[index], temp_vector = getNextVector(line, &tmp_i));
 		}
 		else if (command == "KICK") // :
 		{
@@ -274,7 +275,9 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (command == "PRIVMSG") // :
 		{
-			privmsg(&_users[index],temp_vector = getNextVector(line, &tmp_i, 1), getNextWord(line, &tmp_i));
+			temp_vector = getNextVector(line, &tmp_i);
+			std::string priv_msg = getNextWord(line, &tmp_i);
+			privmsg(&_users[index], temp_vector, priv_msg);
 		}
 		else if (command == "NOTICE")
 		{
@@ -294,6 +297,10 @@ bool	Server::_command_exists(std::string command)
 			return true;
 		}
 		else if (command == "JOIN")
+		{
+			return true;
+		}		
+		else if (command == "PING")
 		{
 			return true;
 		}

@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/04 16:22:31 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/04 18:15:32 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,9 +55,9 @@ void Server::_sendPrivmsgToUser(User const * sender, string recipient, string te
 void Server::_sendTextToChan(User const * sender, Channel const & chan, string text) const{
 	vector<User*>::const_iterator it;
 
-	for (it = chan.getMembers().begin() ; it != chan.getMembers().end() ; ++it) {
+	for (it = chan.getMembers().begin() ; it != chan.getMembers().end() ; ++it)
+		if (sender != *it)
 			_send_txt((*it)->getPollFd(), text);
-		}
 }
 
 void Server::_sendTextToUser(User const * sender, User const * recipient, string text) const{
@@ -122,10 +122,10 @@ void	Server::_displayWelcomeMessage(User * user) {
 			" 0.0.0.42 r opstl");
 }
 
-void _isValidChannelName(string name) {
-	if (name.size < 2)
+bool _isValidChannelName(string name) {
+	if (name.size() < 2)
 		return false;
-	if (name[0] != #)
+	if (name[0] != '#')
 		return false;
 	return true;
 }
@@ -195,14 +195,14 @@ void Server::join(User * user, vector<string> & requested_channels) {
 
 	if (requested_channels.empty())
 		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "JOIN :Not enough parameters");
-	if (_isValidChannelName(*it)) {
-		_sendTextToUser(NULL, user, _composeRplMessage("403", user) + *it + " :No such channel);
-		return ;
-	}
 	for (it = requested_channels.begin() ; it != requested_channels.end() ; ++it) {
 		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 			if (chan->getName() == *it)
 				break;
+		if (!_isValidChannelName(*it)) {
+			_sendTextToUser(NULL, user, _composeRplMessage("403", user) + *it + " :No such channel");
+			return ;
+		}
 		_sendTextToUser(user, user, "JOIN " + *it);
 		if (chan != _channels.end()) { // Cas où le channel existe
 			// On vérifie si le user est déjà dans le channel
@@ -253,7 +253,7 @@ void Server::part(User * user, vector<string> & channels, string partMessage) {
 				_sendTextToUser(NULL, user, _composeRplMessage("442", user) + *it + " :You're not on that channel");
 				return ;
 			}
-			_sendTextToUser(user, user, "PART " + chan->getName() + " :" + partMessage);
+			_sendTextToUser(user, user, "PART " + chan->getName());
 			_sendTextToChan(user, *chan, _composePrefix(user) + "PART " + chan->getName() + " :" + partMessage);
 		}
 		else { // Cas où on n'a pas trouvé le channel
@@ -425,7 +425,7 @@ void Server::_listChannel(User const * user, Channel const & channel) {
 			chanName = channel.getName();
 			topic = channel.getTopic();
 		}
-		_sendTextToUser(NULL, user, _composeRplMessage("322", user) + chanName + ":" + topic); // RPL_LIST
+		_sendTextToUser(NULL, user, _composeRplMessage("322", user) + chanName + " :" + topic); // RPL_LIST
 	}
 }
 

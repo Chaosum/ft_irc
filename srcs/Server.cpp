@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/03 18:01:36 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/04 14:45:31 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,7 +199,6 @@ void	Server::msg_parse(char *buf, int index)
 {
 	int i = 0;
 	std::string	line;
-//	std::string	tmp;
 	std::vector<string> temp_vector;
 	std::string command;
 	while (buf[i] != 0) //dernier argument a refaire en verifiant les ':'
@@ -229,7 +228,11 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (command == "USER") // :
 		{
-			user(&_users[index], getNextWord(line, &tmp_i),getNextWord(line, &tmp_i), getNextWord(line, &tmp_i), getNextWord(line, &tmp_i));
+			std::string userName = getNextWord(line, &tmp_i);
+			std::string hostName = getNextWord(line, &tmp_i);
+			std::string serverName = getNextWord(line, &tmp_i);
+			std::string realName = getNextWord(line, &tmp_i);
+			user(&_users[index], userName, hostName, serverName, realName);
 		}
 		else if (!_command_exists(command))
 			unknownCommand(&_users[index], command);
@@ -249,11 +252,14 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (command == "MODE")
 		{
-			mode(&_users[index], getNextWord(line, &tmp_i), temp_vector = getNextVector(line, &tmp_i, 0));
+			std::string requested_channel_or_user = getNextWord(line, &tmp_i);
+			mode(&_users[index], requested_channel_or_user, temp_vector = getNextVector(line, &tmp_i, 0));
 		}
 		else if (command == "TOPIC") // :
 		{
-			topic(&_users[index], getNextWord(line, &tmp_i), getNextWord(line, &tmp_i));
+			std::string t_chanel = getNextWord(line, &tmp_i);
+			std::string t_topic = getNextWord(line, &tmp_i);
+			topic(&_users[index], t_chanel, t_topic);
 		}
 		else if (command == "LIST")
 		{
@@ -261,7 +267,10 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (command == "KICK") // :
 		{
-			kick(&_users[index], getNextWord(line, &tmp_i), getNextWord(line, &tmp_i), getNextWord(line, &tmp_i));
+			std::string k_channel = getNextWord(line, &tmp_i);
+			std::string k_keckee = getNextWord(line, &tmp_i);
+			std::string k_comment = getNextWord(line, &tmp_i);
+			kick(&_users[index], k_channel, k_keckee, k_comment);
 		}
 		else if (command == "PRIVMSG") // :
 		{
@@ -269,7 +278,9 @@ void	Server::msg_parse(char *buf, int index)
 		}
 		else if (command == "NOTICE")
 		{
-			notice(&_users[index], getNextWord(line, &tmp_i), getNextWord(line, &tmp_i));
+			std::string n_recipient = getNextWord(line, &tmp_i);
+			std::string n_msg = getNextWord(line, &tmp_i);
+			notice(&_users[index], n_recipient, n_msg);
 		}
 		i = i + 2;
 		line.erase();

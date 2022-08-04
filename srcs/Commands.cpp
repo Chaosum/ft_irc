@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/04 16:18:12 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/04 16:22:31 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,6 +195,10 @@ void Server::join(User * user, vector<string> & requested_channels) {
 
 	if (requested_channels.empty())
 		_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "JOIN :Not enough parameters");
+	if (_isValidChannelName(*it)) {
+		_sendTextToUser(NULL, user, _composeRplMessage("403", user) + *it + " :No such channel);
+		return ;
+	}
 	for (it = requested_channels.begin() ; it != requested_channels.end() ; ++it) {
 		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 			if (chan->getName() == *it)
@@ -222,10 +226,6 @@ void Server::join(User * user, vector<string> & requested_channels) {
 			_nameList(*chan, user);
 		}
 		else { // Cas où le channel n'existe pas encore
-			if (_isValidChannelName(*it)) {
-				_sendTextToUser(NULL, user, _composeRplMessage("403", user) + *it + " :No such channel);
-				return ;
-			}
 			_channels.push_back(Channel(*it));
 			_channels.back().addUser(user);
 			_channels.back().setUserChanOp(user, true);

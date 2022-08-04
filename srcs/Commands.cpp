@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/03 16:54:42 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/04 14:42:02 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,7 @@ void Server::quit(User * user, string msg) {
 void Server::join(User * user, vector<string> & requested_channels) {
 	vector<Channel>::iterator chan;
 	vector<string>::iterator it;
+	vector<User*>::const_iterator user_it;
 	string topic;
 
 	if (requested_channels.empty())
@@ -190,7 +191,16 @@ void Server::join(User * user, vector<string> & requested_channels) {
 		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 			if (chan->getName() == *it)
 				break;
-		if (chan != _channels.end()) {
+		_sendTextToUser(user, user, "JOIN :" + *it);
+		if (chan != _channels.end()) { // Cas où le channel existe
+			// On vérifie si le user est déjà dans le channel
+			for (user_it = chan->getMembers().begin() ; user_it != chan->getMembers().end() ; ++user_it)
+				if (*user_it == user)
+					break ;
+			if (user_it != chan->getMembers().end()) {// Cas où le user est déjà dans le channel
+				_sendTextToUser(NULL, user, _composeRplMessage("443", user) + chan->getName() + " :is already on channel");
+				return ;
+			}
 			if (!chan->addUser(user)) { // Cas où le channel est plein
 				_sendTextToUser(NULL, user, _composeRplMessage("471", user) + chan->getName() + " :Cannot join channel (+l)");
 				return ;

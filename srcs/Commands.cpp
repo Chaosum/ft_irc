@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/04 14:42:02 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/04 15:03:42 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -507,4 +507,8 @@ void Server::unknownCommand(User * user, string commandName) {
 
 void Server::notLoggedIn(User * user) {
 	_sendTextToUser(NULL, user, _composeRplMessage("451", user) + ":You have not registered");
+}
+
+void Server::pong(User * user, string message) {
+	_sendTextToUser(NULL, user, "PONG :" + message);
 }

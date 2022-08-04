@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/03 16:12:04 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/04 15:04:09 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ private:
 	void	notice(User * user, string recipient, string msg);
 	void	unknownCommand(User * user, string commandName);
 	void	notLoggedIn(User * user);
+	void	pong(User * user, string message);
 
 public:
 	Server();

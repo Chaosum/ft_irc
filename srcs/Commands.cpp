@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/04 15:39:30 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/04 16:15:57 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,14 @@ void	Server::_displayWelcomeMessage(User * user) {
 			" 0.0.0.42 r opstl");
 }
 
+void _isValidChannelName(string name) {
+	if (name.size < 2)
+		return false;
+	if (name[0] != #)
+		return false;
+	return true;
+}
+
 void Server::pass(User * user, string password) {
 	if (user->isAuth())
 		_sendTextToUser(NULL, user, _composeRplMessage("462", user) + ":You may not reregister");
@@ -214,6 +222,10 @@ void Server::join(User * user, vector<string> & requested_channels) {
 			_nameList(*chan, user);
 		}
 		else { // Cas où le channel n'existe pas encore
+			if (_isValidChannelName(*it)) {
+				_sendTextToUser(NULL, user, _composeRplMessage("403", user) + *it + " :No such channel);
+				return ;
+			}
 			_channels.push_back(Channel(*it));
 			_channels.back().addUser(user);
 			_channels.back().setUserChanOp(user, true);

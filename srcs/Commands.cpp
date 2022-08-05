@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/04 18:15:32 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/05 15:56:51 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,7 +248,7 @@ void Server::part(User * user, vector<string> & channels, string partMessage) {
 		for (chan = _channels.begin() ; chan != _channels.end() && chan->getName() != *it ; ++chan)
 			// On parcourt les channels jusqu'à trouver le bon ou avoir atteint la fin de la liste
 			;
-		if (chan->getName() == *it) { // Cas où on a trouvé le channel
+		if (chan != _channels.end()) { // Cas où on a trouvé le channel
 			if (!chan->deleteUserFromChannel(user)) { // On essaie de supprimer le user de le channel
 				_sendTextToUser(NULL, user, _composeRplMessage("442", user) + *it + " :You're not on that channel");
 				return ;

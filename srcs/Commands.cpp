@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/05 15:56:51 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/05 17:35:47 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,34 +271,38 @@ void Server::_userMode(User * user, User * targetUser, vector<string> & operands
 }
 
 void Server::_displayChannelMode(User * user, Channel * channel) {
-	string res = _composeRplMessage("324", user) + user->getNick() + " +";
+	string res = _composeRplMessage("324", user) + channel->getName();
 	string params;
+	string mode = " +";
 
 	if (channel->isPrivate())
-		res += 'p';
+		mode += "p";
 	if (channel->isSecret())
-		res += 's';
+		mode += "s";
 	if (channel->isTopicSettableOnlyByOp())
-		res += 't';
-	if (channel->getMaxNbOfUser() != numeric_limits<size_t>::max()) {
-		res += 'l';
-		params += channel->getMaxNbOfUser();
+		mode += "t";
+	if (channel->getMaxNbOfUser() != 0) {
+		mode += "l";
+		params += " " + to_string(channel->getMaxNbOfUser());
 	}
-	_sendTextToUser(NULL, user, res + params);
+	mode += params; // On ajoute les paramètres à la fin de la chaîne de mode
+	if (mode == " +") // Si la chaîne de mode est vide, on n'affiche pas le '+'
+		mode.clear();
+	_sendTextToUser(NULL, user, res + mode); // On envoie la chaîne complétée à l'utilisateur
 }
 
 void Server::_channelMode(User * user, Channel * channel, vector<string> & operands) {
-	bool add;
-	string modeString = operands[0];
-	vector<string>::const_iterator currOp = operands.begin() + 1;
-
 	if (operands.empty()) {
 		_displayChannelMode(user, channel);
 		return ;
 	}
-	else if (modeString[0] == '-')
+
+	bool add;
+	string modeString = operands[0];
+	vector<string>::const_iterator currOp = operands.begin() + 1;
+	if (modeString[0] == '-')
 		add = false;
-	else if (modeString[0] == '-')
+	else if (modeString[0] == '+')
 		add = true;
 	else {
 		_sendTextToUser(NULL, user, _composeRplMessage("472", user) + modeString[0] + " :is unknown mode char to me for " + channel->getName());
@@ -347,17 +351,19 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 				ss << *(currOp++);
 				if (!ss.fail()) {
 					ss >> requestedNumberOfUsers;
-					channel->setMaxNbOfUsers(user, requestedNumberOfUsers);
+					if (requestedNumberOfUsers > 0)
+						channel->setMaxNbOfUsers(user, requestedNumberOfUsers);
 				}
 			}
 			else
-				channel->setMaxNbOfUsers(user, numeric_limits<int>::max());
+				channel->setMaxNbOfUsers(user, 0);
 		}
 		else {
 			_sendTextToUser(NULL, user, _composeRplMessage("472", user) + modeString[i] + " :is unknown mode char to me for " + channel->getName());
 			return ;
 		}
 	}
+	_displayChannelMode(user, channel);
 }
 
 void Server::mode(User * user, string requested_channel_or_user, vector<string> & operands) {

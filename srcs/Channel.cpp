@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:25:32 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/03 16:52:41 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/05 17:30:04 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ Channel::Channel():_name(""),
 				   _topic(""),
 				   _members(vector<User*>()),
 				   _chanOps(vector<User*>()),
-				   _maxNbOfUsers(numeric_limits<int>::max()),
+				   _maxNbOfUsers(0),
 				   _isPrivate(false),
 				   _isSecret(false),
 				   _topicSettableOnlyByOp(false) {
@@ -36,7 +36,7 @@ Channel::Channel(const Channel & src) {
 Channel::Channel(string name): _topic(""),
 							   _members(vector<User*>()),
 							   _chanOps(vector<User*>()),
-							   _maxNbOfUsers(numeric_limits<int>::max()),
+							   _maxNbOfUsers(0),
 							   _isPrivate(false),
 							   _isSecret(false),
 							   _topicSettableOnlyByOp(false) {
@@ -60,9 +60,8 @@ Channel & Channel::operator=(const Channel & rhs) {
 
 string Channel::getName() const { return _name; }
 string Channel::getTopic() const { return _topic; }
-size_t Channel::getNumberOfMembers() const { return _members.size(); }
 const vector<User*> &Channel::getMembers() const { return _members; }
-size_t Channel::getMaxNbOfUser() const { return _maxNbOfUsers; }
+int Channel::getMaxNbOfUser() const { return _maxNbOfUsers; }
 bool Channel::isTopicSettableOnlyByOp() const { return _topicSettableOnlyByOp; }
 bool Channel::isSecret() const { return _isSecret; }
 bool Channel::isPrivate() const { return _isPrivate; }
@@ -125,6 +124,8 @@ void Channel::setUserChanOp(User * user, bool value) {
 bool Channel::addUser(User * user) {
 	vector<User*>::const_iterator it;
 
+	if (_maxNbOfUsers != 0 && _members.size() == _maxNbOfUsers) // On vérifie si le channel est plein
+		return false;
 	for (it = _members.begin() ; it != _members.end() ; ++it)
 		if (*it == user)
 			return false;

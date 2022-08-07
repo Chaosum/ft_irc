@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/07 15:02:55 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/07 18:47:56 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ void	Server::wait_for_event()
 			newUser_pollfd.revents = 0;
 			_fds.push_back(newUser_pollfd);
 			User newUser(newUser_pollfd);
-			_users.push_back(newUser);//verifier le constructeur
+			_users.push_back(newUser);
 		}
 		std::vector<pollfd>::iterator	it = _fds.begin();
 		int index = 0;
@@ -121,14 +121,31 @@ void	Server::wait_for_event()
 				for (int i = 0; i < 4096; i++)
 					buf[i] = 0;
 				read_ret = read(it->fd, buf, 4096); //read the message
+				_users[index].incrPollRead(buf);
 				printf("%s", buf);
-				if (msg_parse(buf, index) == 1 || read_ret == 0)
+				if (read_ret == 0)
 				{
 					printf("fd = %d et revent = %d\n", it->fd, it->revents);
+					quit(&_users[index], "");
 					close(it->fd);
 					it = _fds.erase(it); 
 					_users.erase( _users.begin() + index);
-					continue ;
+					continue;
+				}
+				else if (int valid_command = is_command(_users[index].getPollRead()))
+				{
+					std::cout << "pollread av crop = " << _users[index].getPollRead() << std::endl;
+					if (msg_parse(_users[index].getPollRead().substr(0, valid_command), index) == 1)
+					{
+						printf("fd = %d et revent = %d\n", it->fd, it->revents);
+						close(it->fd);
+						it = _fds.erase(it); 
+						_users.erase( _users.begin() + index);
+						continue ;
+					}
+					std::cout << _users[index].getPollRead().size() << std::endl;
+					_users[index].setPollRead(_users[index].getPollRead().substr(valid_command + 1, _users[index].getPollRead().size() - (valid_command + 1)));
+					std::cout << "pollread apres crop = " << _users[index].getPollRead() << std::endl;
 				}
 			}
 			index++;
@@ -136,6 +153,18 @@ void	Server::wait_for_event()
 		}
 		_fds[0].revents = 0;
 	}
+}
+
+int	Server::is_command(std::string command)
+{
+	int i = 0;
+	while (command[i] != 0)
+	{
+		if (command[i] == '\n')
+			return (i);
+		i++;
+	}
+	return (0);
 }
 
 std::string	Server::getNextWord(std::string line, int *i) const
@@ -188,13 +217,13 @@ std::vector<std::string>	Server::getNextVector(std::string line, int *i)
 	return (dest);
 }
 
-int	Server::msg_parse(char *buf, int index)
+int	Server::msg_parse(std::string buf, int index)
 {
 	int i = 0;
 	std::string	line;
 	std::vector<string> temp_vector;
 	std::string command;
-	while (buf[i] != 0) //dernier argument a refaire en verifiant les ':'
+	while (i < buf.size())
 	{
 		int tmp_i = 0;
 		while (buf[i] != '\n' && buf[i] != 0 && buf[i] != '\r')
@@ -235,9 +264,6 @@ int	Server::msg_parse(char *buf, int index)
 		{
 			quit(&_users[index], getNextWord(line, &tmp_i));
 			return (1);
-			// close(_users[index].getPollFd().fd);
-			// _fds.erase(_fds.begin() + index);
-			// _users.erase( _users.begin() + index);
 		}
 		else if (command == "JOIN")
 		{

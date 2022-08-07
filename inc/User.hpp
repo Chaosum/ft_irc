@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/20 15:46:36 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/01 15:04:41 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/07 18:06:14 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ private:
 	pollfd	_poll_fd;
 	bool	_isAuth;
 	string	_password;
+	string	_poll_read;
 public:
 	User();
 	User(pollfd newUser_pollfd);
@@ -57,4 +58,7 @@ public:
 	void	setPasswd(string passwd);
 	bool	isAuth() const;
 	bool	tryAuth(string serverPassword);
+	string	getPollRead() const;
+	void	incrPollRead(char *message);
+	void	setPollRead(std::string message);
 };

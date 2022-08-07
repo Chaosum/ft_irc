@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 17:19:13 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/01 15:47:34 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/07 18:06:26 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,4 +75,16 @@ bool User::tryAuth(string serverPassword) {
 		return true;
 	}
 	return false;
+}
+
+string	User::getPollRead() const { return _poll_read; }
+
+void	User::incrPollRead(char *message)
+{
+	_poll_read += message;
+}
+
+void	User::setPollRead(std::string message)
+{
+	_poll_read = message;
 }

@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/07 14:32:33 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/07 18:02:34 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,8 @@ public:
 	vector<pollfd> getFds();
 	void	init_listen();
 	void	wait_for_event();
-	int	msg_parse(char *buf, int index);
+	int		msg_parse(std::string buf, int index);
+	int	is_command(std::string command);
 	string	getNextWord(std::string line, int *i) const;
 	vector<std::string>	getNextVector(std::string line, int *i);
 };

@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/04 15:30:12 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/07 15:02:55 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,13 +122,11 @@ void	Server::wait_for_event()
 					buf[i] = 0;
 				read_ret = read(it->fd, buf, 4096); //read the message
 				printf("%s", buf);
-				msg_parse(buf, index);
-				if (read_ret == 0)
+				if (msg_parse(buf, index) == 1 || read_ret == 0)
 				{
 					printf("fd = %d et revent = %d\n", it->fd, it->revents);
 					close(it->fd);
 					it = _fds.erase(it); 
-					quit(&_users[index], "");
 					_users.erase( _users.begin() + index);
 					continue ;
 				}
@@ -190,7 +188,7 @@ std::vector<std::string>	Server::getNextVector(std::string line, int *i)
 	return (dest);
 }
 
-void	Server::msg_parse(char *buf, int index)
+int	Server::msg_parse(char *buf, int index)
 {
 	int i = 0;
 	std::string	line;
@@ -233,19 +231,23 @@ void	Server::msg_parse(char *buf, int index)
 			unknownCommand(&_users[index], command);
 		else if (!_users[index].isAuth())
 			notLoggedIn(&_users[index]);
-		else if (command == "QUIT") // :
+		else if (command == "QUIT")
 		{
 			quit(&_users[index], getNextWord(line, &tmp_i));
+			return (1);
+			// close(_users[index].getPollFd().fd);
+			// _fds.erase(_fds.begin() + index);
+			// _users.erase( _users.begin() + index);
 		}
 		else if (command == "JOIN")
 		{
-			join(&_users[index], temp_vector = getNextVector(line, &tmp_i));// virer dernier param
+			join(&_users[index], temp_vector = getNextVector(line, &tmp_i));
 		}
 		else if (command == "PING")
 		{
 			pong(&_users[index], getNextWord(line, &tmp_i));
 		}
-		else if (command == "PART") // :
+		else if (command == "PART")
 		{
 			temp_vector = getNextVector(line, &tmp_i);
 			std::string part_msg = getNextWord(line, &tmp_i);
@@ -288,6 +290,7 @@ void	Server::msg_parse(char *buf, int index)
 		i = i + 2;
 		line.erase();
 	}
+	return (0);
 }
 
 bool	Server::_command_exists(std::string command)

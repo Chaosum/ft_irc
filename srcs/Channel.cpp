@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:25:32 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/05 17:30:04 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/07 15:25:17 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,9 @@ Channel & Channel::operator=(const Channel & rhs) {
 
 string Channel::getName() const { return _name; }
 string Channel::getTopic() const { return _topic; }
-const vector<User*> &Channel::getMembers() const { return _members; }
+int Channel::getNumberOfMembers() const { return _maxNbOfUsers; }
+vector<User*>::const_iterator Channel::membersBegin() const { return _members.begin(); }
+vector<User*>::const_iterator Channel::membersEnd() const { return _members.end(); }
 int Channel::getMaxNbOfUser() const { return _maxNbOfUsers; }
 bool Channel::isTopicSettableOnlyByOp() const { return _topicSettableOnlyByOp; }
 bool Channel::isSecret() const { return _isSecret; }

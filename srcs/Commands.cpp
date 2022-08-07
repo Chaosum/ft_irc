@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/05 17:35:47 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/06 18:22:45 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void Server::_sendPrivmsgToUser(User const * sender, string recipient, string te
 void Server::_sendTextToChan(User const * sender, Channel const & chan, string text) const{
 	vector<User*>::const_iterator it;
 
-	for (it = chan.getMembers().begin() ; it != chan.getMembers().end() ; ++it)
+	for (it = chan.membersBegin() ; it != chan.membersEnd() ; ++it)
 		if (sender != *it)
 			_send_txt((*it)->getPollFd(), text);
 }
@@ -66,7 +66,7 @@ void Server::_sendTextToUser(User const * sender, User const * recipient, string
 
 void	Server::_nameList(Channel const & chan, User const * recipient) const {
 	vector<User*>::const_iterator member;
-	for (member = chan.getMembers().begin() ; member != chan.getMembers().end() ; member++) {
+	for (member = chan.membersBegin() ; member != chan.membersEnd() ; member++) {
 		bool isOp = chan.isUserChanOp(*member);
 		_sendTextToUser(NULL, recipient, _composeRplMessage("353", recipient) + chan.getName() + " :" + (isOp?"@":"+") + (*member)->getNick());
 	}
@@ -206,10 +206,10 @@ void Server::join(User * user, vector<string> & requested_channels) {
 		_sendTextToUser(user, user, "JOIN " + *it);
 		if (chan != _channels.end()) { // Cas où le channel existe
 			// On vérifie si le user est déjà dans le channel
-			for (user_it = chan->getMembers().begin() ; user_it != chan->getMembers().end() ; ++user_it)
+			for (user_it = chan->membersBegin() ; user_it != chan->membersEnd() ; ++user_it)
 				if (*user_it == user)
 					break ;
-			if (user_it != chan->getMembers().end()) {// Cas où le user est déjà dans le channel
+			if (user_it != chan->membersEnd()) {// Cas où le user est déjà dans le channel
 				_sendTextToUser(NULL, user, _composeRplMessage("443", user) + chan->getName() + " :is already on channel");
 				return ;
 			}
@@ -416,7 +416,7 @@ void Server::topic(User * user, string channel, string topic) {
 	}
 	else if (it->setTopic(user, topic)) {
 		vector<User*>::const_iterator chanUser;
-		for (chanUser = it->getMembers().begin() ; chanUser != it->getMembers().end() ; ++chanUser)
+		for (chanUser = it->membersBegin() ; chanUser != it->membersEnd() ; ++chanUser)
 			_sendTextToUser(NULL, *chanUser, _composeRplMessage("332", *chanUser) + channel + " :" + it->getTopic());
 	}
 	else

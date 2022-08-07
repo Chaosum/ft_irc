@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/01 15:02:41 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/07 14:32:33 by matthieu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ private:
 	void	notice(User * user, string recipient, string msg);
 	void	unknownCommand(User * user, string commandName);
 	void	notLoggedIn(User * user);
+	void	pong(User * user, string message);
 
 public:
 	Server();
@@ -92,7 +93,7 @@ public:
 	vector<pollfd> getFds();
 	void	init_listen();
 	void	wait_for_event();
-	void	msg_parse(char *buf, int index);
-	string	getNextWord(std::string line, int *i, std::string &tmp) const;
-	vector<std::string>	getNextVector(std::string line, int *i, int lastword);
+	int	msg_parse(char *buf, int index);
+	string	getNextWord(std::string line, int *i) const;
+	vector<std::string>	getNextVector(std::string line, int *i);
 };

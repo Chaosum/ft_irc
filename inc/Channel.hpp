@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/07 15:25:22 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/07 17:47:00 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ class Channel
 private:
 	string			_name;
 	string			_topic;
-	vector<User*>	_members;
-	vector<User*>	_chanOps;
+	vector<string>	_members;
+	vector<string>	_chanOps;
 	int				_maxNbOfUsers;
 	bool			_isPrivate;
 	bool			_isSecret;
@@ -45,25 +45,25 @@ public:
 	string			getName() const;
 	string			getTopic() const;
 	int				getNumberOfMembers() const;
-	vector<User*>::const_iterator membersBegin() const;
-	vector<User*>::const_iterator membersEnd() const;
-	User *			getMember(string nick) const;
+	vector<string>::const_iterator membersBegin() const;
+	vector<string>::const_iterator membersEnd() const;
+	vector<string>::const_iterator opsBegin() const;
+	vector<string>::const_iterator opsEnd() const;
 	int				getMaxNbOfUser() const;
-	bool			canUserMessageChannel(User const * user) const; // see ERR_CANNOTSENDTOCHAN (404)
-	bool			isUserInChannel(User const * user) const;
-	bool			isUserChanOp(User const * user) const;
+	bool			canUserMessageChannel(string nick) const; // see ERR_CANNOTSENDTOCHAN (404)
+	bool			isUserInChannel(string nick) const;
+	bool			isUserChanOp(string nick) const;
 	bool			isTopicSettableOnlyByOp() const;
-	void			setUserChanOp(User * user, bool value);
+	void			setUserChanOp(string nick, bool value);
 	// Returns ton successful change
-	bool			addUser(User * user);
-	bool			deleteUserFromChannel(User * user);
-	bool			deleteUserFromChannel(string nickname);
-	bool			setPrivate(User const * user, bool value);
+	bool			addUser(string nick);
+	bool			deleteUserFromChannel(string nick);
+	bool			setPrivate(string nick, bool value);
 	bool			isPrivate() const;
-	bool			setSecret(User const * user, bool value);
+	bool			setSecret(string nick, bool value);
 	bool			isSecret() const;
-	bool			setTopicSettableOnlyByOp(User const * user, bool value);
-	bool			setMaxNbOfUsers(User const * op, int maxNb);
-	bool			setTopic(User const * user, string topic);
-	bool			setName(User const * user, string name);
+	bool			setTopicSettableOnlyByOp(string nick, bool value);
+	bool			setMaxNbOfUsers(string nick, int maxNb);
+	bool			setTopic(string nick, string topic);
+	bool			setName(string nick, string name);
 };

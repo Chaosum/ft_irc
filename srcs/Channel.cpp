@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:25:32 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/07 15:25:17 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/07 17:55:09 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 Channel::Channel():_name(""),
 				   _topic(""),
-				   _members(vector<User*>()),
-				   _chanOps(vector<User*>()),
+				   _members(vector<string>()),
+				   _chanOps(vector<string>()),
 				   _maxNbOfUsers(0),
 				   _isPrivate(false),
 				   _isSecret(false),
@@ -34,8 +34,8 @@ Channel::Channel(const Channel & src) {
 }
 
 Channel::Channel(string name): _topic(""),
-							   _members(vector<User*>()),
-							   _chanOps(vector<User*>()),
+							   _members(vector<string>()),
+							   _chanOps(vector<string>()),
 							   _maxNbOfUsers(0),
 							   _isPrivate(false),
 							   _isSecret(false),
@@ -61,85 +61,77 @@ Channel & Channel::operator=(const Channel & rhs) {
 string Channel::getName() const { return _name; }
 string Channel::getTopic() const { return _topic; }
 int Channel::getNumberOfMembers() const { return _maxNbOfUsers; }
-vector<User*>::const_iterator Channel::membersBegin() const { return _members.begin(); }
-vector<User*>::const_iterator Channel::membersEnd() const { return _members.end(); }
+vector<string>::const_iterator Channel::membersBegin() const { return _members.begin(); }
+vector<string>::const_iterator Channel::membersEnd() const { return _members.end(); }
+vector<string>::const_iterator Channel::opsBegin() const { return _chanOps.begin(); }
+vector<string>::const_iterator Channel::opsEnd() const { return _chanOps.end(); }
 int Channel::getMaxNbOfUser() const { return _maxNbOfUsers; }
 bool Channel::isTopicSettableOnlyByOp() const { return _topicSettableOnlyByOp; }
 bool Channel::isSecret() const { return _isSecret; }
 bool Channel::isPrivate() const { return _isPrivate; }
-bool Channel::canUserMessageChannel(User const * user) const {  // see ERR_CANNOTSENDTOCHAN (404)
-	(void)user;
+bool Channel::canUserMessageChannel(string nick) const {  // see ERR_CANNOTSENDTOCHAN (404)
+	(void)nick;
 	return true;
 }
 
-User * Channel::getMember(string nick) const {
-	vector<User*>::const_iterator it;
+bool Channel::isUserInChannel(string nick) const {
+	vector<string>::const_iterator it;
 	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if ((*it)->getNick() == nick)
-			break ;
-	if ((*it)->getNick() == nick)
-		return *it;
-	return NULL;
-}
-
-bool Channel::isUserInChannel(User const * user) const {
-	vector<User*>::const_iterator it;
-	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if (*it == user)
-			break ;
-	if (*it == user)
-		return true;
+		if (*it == nick)
+			return true;
 	return false;
 }
 
-bool Channel::isUserChanOp(User const * user) const {
-	vector<User*>::const_iterator it;
+bool Channel::isUserChanOp(string nick) const {
+	vector<string>::const_iterator it;
 	for (it = _chanOps.begin() ; it != _chanOps.end() ; ++it)
-		if (*it == user)
-			break ;
-	if (*it == user)
-		return true;
+		if (*it == nick)
+			return true;
 	return false;
 }
 
-void Channel::setUserChanOp(User * user, bool value) {
-	vector<User*>::iterator it;
+void Channel::setUserChanOp(string nick, bool value) {
+	vector<string>::iterator it;
 
 	// On vérifie que l'utilisateur est dans le channel avant de le mettre chanop
 	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if (*it == user)
+		if (*it == nick)
 			break ;
 	if (it == _members.end())
 		return ;
 
-	if (value)
-		_chanOps.push_back(user);
+	if (value) { // On ajoute le nick à la liste s'il n'y est pas déjà
+		for (it = _chanOps.begin() ; it != _chanOps.end() ; ++it)
+			if (*it == nick)
+				return ;
+		_chanOps.push_back(nick);
+	}
 	else {
 		for (it = _chanOps.begin() ; it != _chanOps.end() ; ++it)
-			if (*it == user)
+			if (*it == nick)
 				break ;
-		if (*it == user)
+		if (*it == nick)
 			_chanOps.erase(it);
 	}
 }
 
-bool Channel::addUser(User * user) {
-	vector<User*>::const_iterator it;
+bool Channel::addUser(string nick) {
+	vector<string>::const_iterator it;
 
 	if (_maxNbOfUsers != 0 && _members.size() == _maxNbOfUsers) // On vérifie si le channel est plein
 		return false;
 	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if (*it == user)
+		if (*it == nick)
 			return false;
-	_members.push_back(user);
+	_members.push_back(nick);
 	return true;
 }
 
-bool Channel::deleteUserFromChannel(User * user) {
-	vector<User*>::iterator it;
+bool Channel::deleteUserFromChannel(string nick) {
+	vector<string>::iterator it;
 
 	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if (*it == user)
+		if (*it == nick)
 			break ;
 	if (it == _members.end())
 		return false;
@@ -147,35 +139,23 @@ bool Channel::deleteUserFromChannel(User * user) {
 	return true;
 }
 
-bool Channel::deleteUserFromChannel(string nickname) {
-	vector<User*>::iterator it;
+bool Channel::setPrivate(string nick, bool value) {
+	vector<string>::const_iterator it;
 
-	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if ((*it)->getNick() == nickname)
+	for (it = _chanOps.begin() ; it != _chanOps.end() ; ++it)
+		if (*it == nick)
 			break ;
-	if (it == _members.end())
-		return false;
-	_members.erase(it);
-	return true;
-}
-
-bool Channel::setPrivate(User const * user, bool value) {
-	vector<User*>::const_iterator it;
-
-	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if (*it == user)
-			break ;
-	if (it == _members.end())
+	if (it == _chanOps.end())
 		return false;
 	_isPrivate = value;
 	return true;
 }
 
-bool Channel::setSecret(User const * user, bool value) {
-	vector<User*>::const_iterator it;
+bool Channel::setSecret(string nick, bool value) {
+	vector<string>::const_iterator it;
 
-	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if (*it == user)
+	for (it = _chanOps.begin() ; it != _chanOps.end() ; ++it)
+		if (*it == nick)
 			break ;
 	if (it == _members.end())
 		return false;
@@ -183,49 +163,56 @@ bool Channel::setSecret(User const * user, bool value) {
 	return true;
 }
 
-bool Channel::setTopicSettableOnlyByOp(User const * user, bool value) {
-	vector<User*>::const_iterator it;
+bool Channel::setTopicSettableOnlyByOp(string nick, bool value) {
+	vector<string>::const_iterator it;
 
-	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if (*it == user)
+	for (it = _chanOps.begin() ; it != _chanOps.end() ; ++it)
+		if (*it == nick)
 			break ;
-	if (it == _members.end())
+	if (it == _chanOps.end())
 		return false;
 	_topicSettableOnlyByOp = value;
 	return true;
 }
 
-bool Channel::setMaxNbOfUsers(User const * op, int maxNb) {
-	vector<User*>::const_iterator it;
+bool Channel::setMaxNbOfUsers(string nick, int maxNb) {
+	vector<string>::const_iterator it;
 
-	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if (*it == op)
+	for (it = _chanOps.begin() ; it != _chanOps.end() ; ++it)
+		if (*it == nick)
 			break ;
-	if (it == _members.end())
+	if (it == _chanOps.end())
 		return false;
 	_maxNbOfUsers = maxNb;
 	return true;
 }
 
-bool Channel::setTopic(User const * user, string topic) {
-	vector<User*>::const_iterator it;
+bool Channel::setTopic(string nick, string topic) {
+	vector<string>::const_iterator it;
 
 	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if (*it == user)
+		if (*it == nick)
 			break ;
 	if (it == _members.end())
 		return false;
+	if (_topicSettableOnlyByOp) {
+		for (it = _chanOps.begin() ; it != _chanOps.end() ; ++it)
+			if (*it == nick)
+				break ;
+		if (it == _chanOps.end())
+			return false;
+	}
 	_topic = topic;
 	return true;
 }
 
-bool Channel::setName(User const * user, string name) {
-	vector<User*>::const_iterator it;
+bool Channel::setName(string nick, string name) {
+	vector<string>::const_iterator it;
 
-	for (it = _members.begin() ; it != _members.end() ; ++it)
-		if (*it == user)
+	for (it = _chanOps.begin() ; it != _chanOps.end() ; ++it)
+		if (*it == nick)
 			break ;
-	if (it == _members.end())
+	if (it == _chanOps.end())
 		return false;
 	_name = name;
 	return true;

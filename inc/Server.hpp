@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/07 14:32:33 by matthieu         ###   ########.fr       */
+/*   Updated: 2022/08/07 18:07:41 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ private:
 	void	_displayChannelMode(User * user, Channel * channel);
 	void	_displayWelcomeMessage(User * user);
 	bool	_command_exists(std::string line);
+	User *	_getUser(string nick);
+	const User *	_getUser(string nick) const;
 	// Server commands
 	void	pass(User * user, string password);
 	void	nick(User * user, string nickname);

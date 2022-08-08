@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:25:32 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/07 17:55:09 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/08 17:04:13 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,21 @@ void Channel::setUserChanOp(string nick, bool value) {
 		if (*it == nick)
 			_chanOps.erase(it);
 	}
+}
+
+void Channel::changeNickOfUser(string oldNick, string newNick) {
+	vector<string>::iterator user;
+
+	for (user = _members.begin() ; user != _members.end() ; ++user)
+		if (*user == oldNick) {
+			*user = newNick;
+			break ;
+		}
+	for (user = _chanOps.begin() ; user != _chanOps.end() ; ++user)
+		if (*user == oldNick) {
+			*user = newNick;
+			break ;
+		}
 }
 
 bool Channel::addUser(string nick) {

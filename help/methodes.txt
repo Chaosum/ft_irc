@@ -26,8 +26,6 @@ voir pour channel.cpp
 
 leto
 
-penser à modifier NICK pour qu'il change le nick aussi dans les channels
-problème avec les pointeurs sur éléments de vecteur
 ajouter mode +n aux chan ?
 
 mode channel: o p s t l

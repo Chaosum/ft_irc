@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/07 18:32:34 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/08 17:01:44 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,13 @@ void Server::pass(User * user, string password) {
 	}
 }
 
+void Server::_changeNicksInChan(string oldNick, string newNick) {
+	vector<Channel>::iterator chan;
+
+	for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
+		chan->changeNickOfUser(oldNick, newNick);
+}
+
 void Server::nick(User * user, string nickname) {
 	if (nickname.empty())
 		_sendTextToUser(NULL, user, _composeRplMessage("431", user) + ":No nickname given");
@@ -170,6 +177,8 @@ void Server::nick(User * user, string nickname) {
 	else if (!_isValidNickname(nickname))
 		_sendTextToUser(NULL, user, _composeRplMessage("432", user) + nickname + " :Erroneus nickname");
 	else {
+		if (user->isAuth())
+			_changeNicksInChan(user->getNick(), nickname);
 		user->setNick(nickname);
 		if (!user->isAuth() && user->tryAuth(this->_password))
 			_displayWelcomeMessage(user);

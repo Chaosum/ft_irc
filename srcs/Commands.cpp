@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/09 13:42:19 by mservage         ###   ########.fr       */
+/*   Updated: 2022/08/09 14:04:37 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -494,7 +494,7 @@ void Server::kick(User * user, string channel, string kickee, string comment) {
 	}
 	// On cherche le channel dans la liste
 	for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
-		if (chan->getName() != channel) // On a trouvé le bon channel
+		if (chan->getName() == channel) // On a trouvé le bon channel
 			break ;
 	// Cas où le channel n'est pas trouvé
 	if (chan == _channels.end()) {

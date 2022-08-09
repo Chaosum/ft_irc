@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/08 17:05:48 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/09 10:49:58 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,15 +88,16 @@ public:
 	Server(string server_name, int port, char *password);
 	~Server();
 
-	void					_send_txt(pollfd poll_fd, string text) const;
-	Server					&operator=(Server const &rhs);
-	int						getPort(void) const;
-	string					getServerName(void) const;
-	string					getPassword(void) const;
-	vector<pollfd>			getFds();
-	void					init_listen();
-	void					wait_for_event();
-	int						msg_parse(char *buf, int index);
-	string					getNextWord(string line, int *i) const;
-	vector<string>			getNextVector(string line, int *i);
+	void			_send_txt(pollfd poll_fd, string text) const;
+	Server			&operator=(Server const &rhs);
+	int				getPort(void) const;
+	string			getServerName(void) const;
+	string			getPassword(void) const;
+	vector<pollfd>	getFds();
+	void			init_listen();
+	void			wait_for_event();
+	int				msg_parse(string buf, int index);
+	string			getNextWord(string line, int *i) const;
+	int				is_command(string command);
+	vector<string>	getNextVector(string line, int *i);
 };

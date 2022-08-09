@@ -27,8 +27,6 @@ voir pour channel.cpp
 leto
 
 mode +n
-err 403 dans join
-quit
 
 ajouter mode +n aux chan ?
 

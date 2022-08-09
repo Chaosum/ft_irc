@@ -26,9 +26,7 @@ voir pour channel.cpp
 
 leto
 
-vérifier nick
 mode +n
-kick
 err 403 dans join
 quit
 

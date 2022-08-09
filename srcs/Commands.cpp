@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/09 17:12:39 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/09 17:36:11 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,6 +170,8 @@ void Server::_changeNicksInChan(string oldNick, string newNick) {
 }
 
 void Server::nick(User * user, string nickname) {
+	vector<User>::const_iterator user_it;
+
 	if (nickname.empty())
 		_sendTextToUser(NULL, user, _composeRplMessage("431", user) + ":No nickname given");
 	else if (!_isNickAvailable(nickname))
@@ -177,6 +179,10 @@ void Server::nick(User * user, string nickname) {
 	else if (!_isValidNickname(nickname))
 		_sendTextToUser(NULL, user, _composeRplMessage("432", user) + nickname + " :Erroneus nickname");
 	else {
+
+		for (user_it = _users.begin() ; user_it != _users.end() ; ++user_it)
+			if (user->isAuth())
+				_sendTextToUser(user, &*user_it, "NICK " + nickname);
 		if (user->isAuth())
 			_changeNicksInChan(user->getNick(), nickname);
 		user->setNick(nickname);

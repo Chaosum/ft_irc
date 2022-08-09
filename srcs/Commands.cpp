@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/09 14:04:37 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/09 17:12:39 by lgaudet-         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -501,9 +501,9 @@ void Server::kick(User * user, string channel, string kickee, string comment) {
 		_sendTextToUser(NULL, user, _composeRplMessage("403", user) + channel + " :No such channel");
 		return ;
 	}
-	if (!chan->isUserChanOp(user->getNick()))
+	if (!chan->isUserChanOp(user->getNick())) // On vérifie que l'utilisateur a le droit de faire l'opération
 		_sendTextToUser(NULL, user, _composeRplMessage("482", user) + channel + " :You're not channel operator");
-	else if (!chan->deleteUserFromChannel(kickee))
+	else if (!chan->deleteUserFromChannel(kickee)) // On essaie de kick la cible
 		_sendTextToUser(NULL, user, _composeRplMessage("441", user) + kickee + " " + channel + " :They aren't on that channel");
 	else { // Cas où la commande a réussi
 		vector<User>::const_iterator targetUser;
@@ -513,6 +513,7 @@ void Server::kick(User * user, string channel, string kickee, string comment) {
 			if (targetUser->getNick() == kickee)
 				break ;
 		_sendTextToUser(user, &*targetUser, kickMsg);
+		_sendTextToUser(user, user, kickMsg);
 		_sendTextToChan(user, *chan, _composePrefix(user) + kickMsg);
 	}
 }

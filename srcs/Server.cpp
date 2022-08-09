@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/09 10:48:02 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/09 13:54:43 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,6 @@ void	Server::wait_for_event()
 				}
 				else if (int valid_command = is_command(_users[index].getPollRead()))
 				{
-					std::cout << "pollread av crop = " << _users[index].getPollRead() << std::endl;
 					if (msg_parse(_users[index].getPollRead().substr(0, valid_command), index) == 1)
 					{
 						printf("fd = %d et revent = %d\n", it->fd, it->revents);
@@ -143,9 +142,7 @@ void	Server::wait_for_event()
 						_users.erase( _users.begin() + index);
 						continue ;
 					}
-					std::cout << _users[index].getPollRead().size() << std::endl;
 					_users[index].setPollRead(_users[index].getPollRead().substr(valid_command + 1, _users[index].getPollRead().size() - (valid_command + 1)));
-					std::cout << "pollread apres crop = " << _users[index].getPollRead() << std::endl;
 				}
 			}
 			index++;

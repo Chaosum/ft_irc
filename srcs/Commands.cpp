@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/08 17:01:44 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/09 13:42:19 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,6 +217,7 @@ void Server::quit(User * user, string msg) {
 void Server::join(User * user, vector<string> & requested_channels) {
 	vector<Channel>::iterator chan;
 	vector<string>::const_iterator it;
+	vector<string>::const_iterator user_it;
 	string topic;
 
 	if (requested_channels.empty())
@@ -232,10 +233,10 @@ void Server::join(User * user, vector<string> & requested_channels) {
 		_sendTextToUser(user, user, "JOIN " + *it);
 		if (chan != _channels.end()) { // Cas où le channel existe
 			// On vérifie si le user est déjà dans le channel
-			for (it = chan->membersBegin() ; it != chan->membersEnd() ; ++it)
-				if (*it == user->getNick())
+			for (user_it = chan->membersBegin() ; user_it != chan->membersEnd() ; ++user_it)
+				if (*user_it == user->getNick())
 					break ;
-			if (it != chan->membersEnd()) {// Cas où le user est déjà dans le channel
+			if (user_it != chan->membersEnd()) {// Cas où le user est déjà dans le channel
 				_sendTextToUser(NULL, user, _composeRplMessage("443", user) + chan->getName() + " :is already on channel");
 				return ;
 			}

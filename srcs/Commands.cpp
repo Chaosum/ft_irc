@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/10 14:34:06 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 16:22:21 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ void	Server::_displayWelcomeMessage(User * user) {
 			this->_server_name + ", running version 0.0.0.42");
 	_sendTextToUser(NULL, user, _composeRplMessage("003", user) + "This server was created some time ago");
 	_sendTextToUser(NULL, user, _composeRplMessage("004", user) + this->_server_name +
-			" 0.0.0.42 r opstl");
+			" 0.0.0.42 r onpstl");
 }
 
 bool _isValidChannelName(string name) {
@@ -222,10 +222,6 @@ void Server::quit(User * user, string msg) {
 				chan = _channels.begin();
 				chan--;
 			}
-			else if (chan->opsBegin() == chan->opsEnd()) { // Il n'y a plus de chanop
-				chan->setUserChanOp(*(chan->membersBegin()), true);
-				_sendTextToChan(NULL, *chan, _composePrefix(NULL) + "MODE " + chan->getName() + " +o " + *chan->opsBegin());
-			}
 		}
 }
 
@@ -304,11 +300,6 @@ void Server::part(User * user, vector<string> & channels, string partMessage) {
 				chan = _channels.begin();
 				chan--;
 			}
-			else if (chan->opsBegin() == chan->opsEnd()) { // Il n'y a plus de chanop
-				chan->setUserChanOp(*(chan->membersBegin()), true);
-				_sendTextToChan(NULL, *chan, _composePrefix(NULL) + "MODE " + chan->getName() + " +o " + *chan->opsBegin());
-			}
-
 		}
 		else { // Cas où on n'a pas trouvé le channel
 			_sendTextToUser(NULL, user, _composeRplMessage("403", user) + *it + " :No such channel");

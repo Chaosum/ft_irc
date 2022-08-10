@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/10 13:46:45 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 14:34:06 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ string Server::_composePrefix(User const * sender) const{
 	if (sender == NULL)
 		return ":" + _server_name + " ";
 	res.append(":" + sender->getNick() + "!" + sender->getUserName());
-	res.append("@" + _server_name + " ");
+	res.append("@" + sender->getHostName() + " ");
 	return res;
 }
 
@@ -217,8 +217,11 @@ void Server::quit(User * user, string msg) {
 		if (chan->isUserInChannel(user->getNick())) {
 			chan->deleteUserFromChannel(user->getNick());
 			_sendTextToChan(user, *chan, _composePrefix(user) + "QUIT :" + msg);
-			if (chan->membersBegin() == chan->membersEnd()) // Le channel est vide
+			if (chan->membersBegin() == chan->membersEnd()) {// Le channel est vide
 				_channels.erase(chan);
+				chan = _channels.begin();
+				chan--;
+			}
 			else if (chan->opsBegin() == chan->opsEnd()) { // Il n'y a plus de chanop
 				chan->setUserChanOp(*(chan->membersBegin()), true);
 				_sendTextToChan(NULL, *chan, _composePrefix(NULL) + "MODE " + chan->getName() + " +o " + *chan->opsBegin());
@@ -296,8 +299,11 @@ void Server::part(User * user, vector<string> & channels, string partMessage) {
 			_sendTextToUser(user, user, "PART " + chan->getName());
 			_sendTextToChan(user, *chan, _composePrefix(user) + "PART " + chan->getName() + " :" + partMessage);
 			// On vérifie qu'il reste au moins un opérateur de channel, et on supprime le channel s'il est vide
-			if (chan->membersBegin() == chan->membersEnd()) // Le channel est vide
+			if (chan->membersBegin() == chan->membersEnd()) { // Le channel est vide
 				_channels.erase(chan);
+				chan = _channels.begin();
+				chan--;
+			}
 			else if (chan->opsBegin() == chan->opsEnd()) { // Il n'y a plus de chanop
 				chan->setUserChanOp(*(chan->membersBegin()), true);
 				_sendTextToChan(NULL, *chan, _composePrefix(NULL) + "MODE " + chan->getName() + " +o " + *chan->opsBegin());

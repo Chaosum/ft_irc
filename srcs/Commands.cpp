@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/10 11:21:00 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 13:46:45 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void Server::_sendPrivmsgToChan(User const * sender, string channel, string text
 			break;
 	if (chan == _channels.end())
 		_sendTextToUser(NULL, sender, _composeRplMessage("401", sender) + channel + " :No such nick/channel");
-	if (!chan->canUserMessageChannel(sender->getNick()))
+	else if (!chan->canUserMessageChannel(sender->getNick()))
 		_sendTextToUser(NULL, sender, _composeRplMessage("404", sender) + channel + " :Cannot send to channel");
 	else
 		_sendTextToChan(sender, *chan, _composePrefix(sender) + "PRIVMSG " + channel + " :" + text);
@@ -217,6 +217,12 @@ void Server::quit(User * user, string msg) {
 		if (chan->isUserInChannel(user->getNick())) {
 			chan->deleteUserFromChannel(user->getNick());
 			_sendTextToChan(user, *chan, _composePrefix(user) + "QUIT :" + msg);
+			if (chan->membersBegin() == chan->membersEnd()) // Le channel est vide
+				_channels.erase(chan);
+			else if (chan->opsBegin() == chan->opsEnd()) { // Il n'y a plus de chanop
+				chan->setUserChanOp(*(chan->membersBegin()), true);
+				_sendTextToChan(NULL, *chan, _composePrefix(NULL) + "MODE " + chan->getName() + " +o " + *chan->opsBegin());
+			}
 		}
 }
 
@@ -292,8 +298,10 @@ void Server::part(User * user, vector<string> & channels, string partMessage) {
 			// On vérifie qu'il reste au moins un opérateur de channel, et on supprime le channel s'il est vide
 			if (chan->membersBegin() == chan->membersEnd()) // Le channel est vide
 				_channels.erase(chan);
-			else if (chan->opsBegin() == chan->opsEnd()) // Il n'y a plus de chanop
+			else if (chan->opsBegin() == chan->opsEnd()) { // Il n'y a plus de chanop
 				chan->setUserChanOp(*(chan->membersBegin()), true);
+				_sendTextToChan(NULL, *chan, _composePrefix(NULL) + "MODE " + chan->getName() + " +o " + *chan->opsBegin());
+			}
 
 		}
 		else { // Cas où on n'a pas trouvé le channel
@@ -363,10 +371,9 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 				return ; 
 			}
 			if ((user == targetUser && !add) || channel->isUserChanOp(user->getNick())) {
-				if (add)
-					channel->setUserChanOp(targetUser->getNick(), true);
-				else
-					channel->setUserChanOp(targetUser->getNick(), false);
+				channel->setUserChanOp(targetUser->getNick(), add);
+				_sendTextToChan(user, *channel, _composePrefix(user) + "MODE " + channel->getName() + " " + (add?"+":"-") + "o " + targetUser->getNick());
+				_sendTextToUser(user, user, "MODE " + channel->getName() + " " + (add?"+":"-") + "o " + targetUser->getNick());
 			}
 			else {
 				_sendTextToUser(NULL, user, _composeRplMessage("482", user) + channel->getName() + " :You're not channel operator");

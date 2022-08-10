@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/09 13:54:43 by mservage         ###   ########.fr       */
+/*   Updated: 2022/08/10 16:43:07 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ void	Server::init_listen()
 	pollfd		poll_fd;
 
 	poll_fd.fd = socket(AF_INET, SOCK_STREAM, 0);
+	fcntl(poll_fd.fd, F_SETFL, O_NONBLOCK);
 	this->_address.sin_family = AF_INET;
 	this->_address.sin_port = htons(this->_port); //port de notre serveur
 	this->_address.sin_addr.s_addr = INADDR_ANY;
@@ -102,6 +103,7 @@ void	Server::wait_for_event()
 			std::cout << "New User accepted" << std::endl;
 			int new_user = accept(_fds[0].fd, (struct sockaddr *)&_address, (socklen_t *)&_addr_size);
 			pollfd	newUser_pollfd;
+			fcntl(new_user, F_SETFL, O_NONBLOCK);
 			newUser_pollfd.fd = new_user;
 			newUser_pollfd.events = POLLIN|POLLOUT;
 			newUser_pollfd.revents = 0;
@@ -157,8 +159,8 @@ int	Server::is_command(std::string command)
 	int i = 0;
 	while (command[i] != 0)
 	{
-		if (command[i] == '\n')
-			return (i);
+		if (command[i] == '\r' && command[i + 1] == '\n')
+			return (i + 1);
 		i++;
 	}
 	return (0);
@@ -174,7 +176,7 @@ std::string	Server::getNextWord(std::string line, int *i) const
 	if (line[*i] == ':')
 	{
 		*i = *i + 1;
-		while (line[*i] != '\r' && line[*i] != '\n' && line[*i] != 0)
+		while (line[*i] != '\r' && line[*i] != 0)
 		{
 			tmp = tmp + line[*i];
 			*i = *i + 1;
@@ -223,7 +225,7 @@ int	Server::msg_parse(std::string buf, int index)
 	while (i < buf.size())
 	{
 		int tmp_i = 0;
-		while (buf[i] != '\n' && buf[i] != 0 && buf[i] != '\r')
+		while (buf[i] != 0 && buf[i] != '\r')
 		{
 			line = line + buf[i];
 			i++;

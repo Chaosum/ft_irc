@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:01:01 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/08 17:01:39 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 10:54:04 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ private:
 	bool							_isPrivate;
 	bool							_isSecret;
 	bool							_topicSettableOnlyByOp;
+	bool							_isMessageFromOutsideAllowed;
 
 	
 public:
@@ -63,6 +64,8 @@ public:
 	bool							isPrivate() const;
 	bool							setSecret(string nick, bool value);
 	bool							isSecret() const;
+	bool							setMessageFromOutsideAllowed(string nick, bool value);
+	bool							isMessageFromOutsideAllowed() const;
 	bool							setTopicSettableOnlyByOp(string nick, bool value);
 	bool							setMaxNbOfUsers(string nick, int maxNb);
 	bool							setTopic(string nick, string topic);

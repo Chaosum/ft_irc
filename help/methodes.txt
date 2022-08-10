@@ -26,9 +26,7 @@ voir pour channel.cpp
 
 leto
 
-mode +n
-
-ajouter mode +n aux chan ?
+enlever les pointeurs de user et remplacer par des refs
 
 mode channel: o p s t l
 ERR_NEEDMOREPARAMS

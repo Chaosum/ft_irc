@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/09 17:43:15 by lgaudet-         ###   ########lyon.fr   */
+/*   Updated: 2022/08/10 11:21:00 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -315,6 +315,8 @@ void Server::_displayChannelMode(User * user, Channel * channel) {
 	string params;
 	string mode = " +";
 
+	if (!channel->isMessageFromOutsideAllowed())
+		mode += "n";
 	if (channel->isPrivate())
 		mode += "p";
 	if (channel->isSecret())
@@ -338,6 +340,7 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 	}
 
 	bool add;
+
 	string modeString = operands[0];
 	vector<string>::const_iterator currOp = operands.begin() + 1;
 	if (modeString[0] == '-')
@@ -374,12 +377,14 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 			_sendTextToUser(NULL, user, _composeRplMessage("482", user) + channel->getName() + " :You're not channel operator");
 			return ;
 		}
+		else if (modeString[i] == 'n')
+			channel->setMessageFromOutsideAllowed(user->getNick(), !add);
 		else if (modeString[i] == 'p')
-				channel->setPrivate(user->getNick(), add);
+			channel->setPrivate(user->getNick(), add);
 		else if (modeString[i] == 's')
-				channel->setSecret(user->getNick(), add);
+			channel->setSecret(user->getNick(), add);
 		else if (modeString[i] == 't')
-				channel->setTopicSettableOnlyByOp(user->getNick(), add);
+			channel->setTopicSettableOnlyByOp(user->getNick(), add);
 		else if (modeString[i] == 'l') {
 			if (add) {
 				if (currOp->empty()) {

@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:25:32 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/08 17:04:13 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 11:06:02 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ Channel::Channel():_name(""),
 				   _maxNbOfUsers(0),
 				   _isPrivate(false),
 				   _isSecret(false),
-				   _topicSettableOnlyByOp(false) {
+				   _topicSettableOnlyByOp(true),
+				   _isMessageFromOutsideAllowed(false) {
 }
 
 Channel::Channel(const Channel & src) {
@@ -31,16 +32,18 @@ Channel::Channel(const Channel & src) {
 	this->_isPrivate = src._isPrivate;
 	this->_isSecret = src._isSecret;
 	this->_topicSettableOnlyByOp = src._topicSettableOnlyByOp;
+	this->_isMessageFromOutsideAllowed = src._isMessageFromOutsideAllowed;
 }
 
-Channel::Channel(string name): _topic(""),
+Channel::Channel(string name): _name(name),
+							   _topic(""),
 							   _members(vector<string>()),
 							   _chanOps(vector<string>()),
 							   _maxNbOfUsers(0),
 							   _isPrivate(false),
 							   _isSecret(false),
-							   _topicSettableOnlyByOp(false) {
-	this->_name = name;
+							   _topicSettableOnlyByOp(true),
+							   _isMessageFromOutsideAllowed(false) {
 }
 	
 Channel::~Channel() {}
@@ -54,6 +57,7 @@ Channel & Channel::operator=(const Channel & rhs) {
 	this->_isPrivate = rhs._isPrivate;
 	this->_isSecret = rhs._isSecret;
 	this->_topicSettableOnlyByOp = rhs._topicSettableOnlyByOp;
+	this->_isMessageFromOutsideAllowed = rhs._isMessageFromOutsideAllowed;
 
 	return *this;
 }
@@ -69,9 +73,27 @@ int Channel::getMaxNbOfUser() const { return _maxNbOfUsers; }
 bool Channel::isTopicSettableOnlyByOp() const { return _topicSettableOnlyByOp; }
 bool Channel::isSecret() const { return _isSecret; }
 bool Channel::isPrivate() const { return _isPrivate; }
+bool Channel::isMessageFromOutsideAllowed() const { return _isMessageFromOutsideAllowed; }
+bool Channel::setMessageFromOutsideAllowed(string nick, bool value) {
+	vector<string>::const_iterator user;
+
+	for (user = _chanOps.begin() ; user != _chanOps.end() ; ++user)
+		if (*user == nick) {
+			_isMessageFromOutsideAllowed = value;
+			return true;
+		}
+	return false;
+}
+
 bool Channel::canUserMessageChannel(string nick) const {  // see ERR_CANNOTSENDTOCHAN (404)
-	(void)nick;
-	return true;
+	vector<string>::const_iterator user;
+
+	if (_isMessageFromOutsideAllowed)
+		return true;
+	for (user = _members.begin() ; user != _members.end() ; ++user)
+		if (*user == nick)
+			return true;
+	return false;
 }
 
 bool Channel::isUserInChannel(string nick) const {

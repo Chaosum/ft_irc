@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/10 16:35:52 by mservage         ###   ########.fr       */
+/*   Updated: 2022/08/10 17:32:55 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -563,25 +563,30 @@ void Server::privmsg(User * user, vector<string> & recipients, string msg) {
 	}
 }
 
-void Server::notice(User * user, string recipient, string msg) {
-	vector<User>::iterator it;
+void Server::notice(User * user, vector<string> & recipients, string msg) {
+	vector<User>::iterator user_it;
 	vector<Channel>::iterator chan;
+	vector<string>::iterator it;
 
-	if (recipient[0] == '#' || recipient[0] == '&') { // Case where the recipient is a channel
-		for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
-			if (chan->getName() == recipient)
-				break;
-		_sendTextToChan(user, *chan, _composePrefix(user) + "NOTICE " + recipient + " :" + msg);
-	}
-	else if (recipient == "jeanMichel")
-		_botMsg(user, msg);
-	else
-		for (it = _users.begin() ; it != _users.end() ; ++it) {
-			if (it->getNick() == recipient) {
-				_sendTextToUser(user, &*it, "NOTICE " + recipient + " :" + msg);
-				break;
-			}
+	if (recipients.empty() || msg.empty())
+		return ;
+	for (it = recipients.begin() ; it != recipients.end() ; ++it) {
+		if ((*it)[0] == '#' || (*it)[0] == '&') { // Case where the recipient is a channel
+			for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
+				if (chan->getName() == *it)
+					break;
+			_sendTextToChan(user, *chan, _composePrefix(user) + "NOTICE " + recipient + " :" + msg);
 		}
+		else if (*it == "jeanMichel")
+			_botMsg(user);
+		else
+			for (user_it = _users.begin() ; user_it != _users.end() ; ++it) {
+				if (user_it->getNick() == *it) {
+					_sendTextToUser(user, &*user_it, "NOTICE " + *it + " :" + msg);
+					break;
+				}
+			}
+	}
 }
 
 void Server::unknownCommand(User * user, string commandName) {

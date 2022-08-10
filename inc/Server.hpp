@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/10 15:57:54 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 17:21:37 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ private:
 	void			list(User * user, vector<string> & channels);
 	void			kick(User * user, string channel, string kickee, string comment);
 	void			privmsg(User * user, vector<string> & recipients, string msg);
-	void			notice(User * user, string recipient, string msg);
+	void			notice(User * user, vector<string> recipients, string msg);
 	void			unknownCommand(User * user, string commandName);
 	void			notLoggedIn(User * user);
 	void			pong(User * user, string message);

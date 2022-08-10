@@ -6,7 +6,7 @@
 /*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/09 10:49:58 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 15:57:54 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 #include <sstream>
 #include <iostream>
 #include <limits>
+#include <cstdlib>
+#include <ctime>
 #include "Channel.hpp"
 #include "User.hpp"
 
@@ -65,6 +67,7 @@ private:
 	User *			_getUser(string nick);
 	const User *	_getUser(string nick) const;
 	void			_changeNicksInChan(string oldNick, string newNick);
+	void			_botMsg(User * user) const;
 	// Server commands
 	void			pass(User * user, string password);
 	void			nick(User * user, string nickname);

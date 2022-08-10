@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/10 16:22:21 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 16:23:11 by lgaudet-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -533,6 +533,13 @@ void Server::kick(User * user, string channel, string kickee, string comment) {
 	}
 }
 
+void Server::_botMsg(User * user) const {
+	string joke[3] = {"Qu’est-ce qui est rouge et mauvais pour les dents ? Une brique !", "Casse-toi tu pues, et marche à l’ombre", "Qu’est-ce qui est petit et marron ? Un marron !"};
+
+	srand(time(NULL));
+	_send_txt(user->getPollFd(), ":jeanMichel!bot@localhost NOTICE " + user->getNick() + " :" + joke[rand() % 3]);
+}
+
 void Server::privmsg(User * user, vector<string> & recipients, string msg) {
 	if (recipients.empty()) {
 		_sendTextToUser(NULL, user, _composeRplMessage("411", user) + ":No recipient given (<PRIVMSG>)");
@@ -546,6 +553,8 @@ void Server::privmsg(User * user, vector<string> & recipients, string msg) {
 	for (it = recipients.begin() ; it != recipients.end() ; ++it) {
 		if ((*it)[0] == '#' || (*it)[0] == '&') // Case where the recipient is a channel
 			_sendPrivmsgToChan(user, *it, msg);
+		else if (*it == "jeanMichel")
+			_botMsg(user);
 		else // Case where the recipient is a user
 			_sendPrivmsgToUser(user, *it, msg);
 	}
@@ -561,6 +570,8 @@ void Server::notice(User * user, string recipient, string msg) {
 				break;
 		_sendTextToChan(user, *chan, _composePrefix(user) + "NOTICE " + recipient + " :" + msg);
 	}
+	else if (recipient == "jeanMichel")
+		_botMsg(user);
 	else
 		for (it = _users.begin() ; it != _users.end() ; ++it) {
 			if (it->getNick() == recipient) {

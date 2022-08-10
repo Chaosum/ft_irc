@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/04 17:34:40 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/10 16:43:07 by mservage         ###   ########.fr       */
+/*   Updated: 2022/08/10 17:51:01 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ Server::Server(Server const &src)
 	this->_password = src._password;
 }
 
-Server::Server(std::string server_name, int port, char *password): _server_name(server_name), _port(port), _password(password)
+Server::Server(std::string server_name, int port, char *password): _server_name(server_name), _password(password), _port(port)
 {
 	this->_addr_size = sizeof(_address);
 }
@@ -132,6 +132,8 @@ void	Server::wait_for_event()
 					close(it->fd);
 					it = _fds.erase(it); 
 					_users.erase( _users.begin() + index);
+					it = _fds.begin() + 1;
+					index = 0;
 					continue;
 				}
 				else if (int valid_command = is_command(_users[index].getPollRead()))
@@ -142,6 +144,8 @@ void	Server::wait_for_event()
 						close(it->fd);
 						it = _fds.erase(it); 
 						_users.erase( _users.begin() + index);
+						it = _fds.begin() + 1;
+						index = 0;
 						continue ;
 					}
 					_users[index].setPollRead(_users[index].getPollRead().substr(valid_command + 1, _users[index].getPollRead().size() - (valid_command + 1)));
@@ -216,9 +220,32 @@ std::vector<std::string>	Server::getNextVector(std::string line, int *i)
 	return (dest);
 }
 
+std::vector<std::string>	Server::getNextVectorcomma(std::string line, int *i)
+{
+	std::vector<std::string> dest;
+	std::string tmp;
+	int i_save = 0;
+	while (line[*i] != '\r' && line[*i] != 0)
+	{
+		tmp.clear();
+		i_save = *i;
+		while (line[*i] == ' ' || line[*i] == ',')
+			*i = *i + 1;
+		if (line[*i] == ':')
+			return (dest);
+		while (line[*i] != ' ' && line[*i] != ',' && line[*i] != 0 && line[*i] != '\r')
+		{
+			tmp = tmp + line[*i];
+			*i = *i + 1;
+		}
+		dest.push_back(tmp);
+	}
+	return (dest);
+}
+
 int	Server::msg_parse(std::string buf, int index)
 {
-	int i = 0;
+	size_t i = 0;
 	std::string	line;
 	std::vector<string> temp_vector;
 	std::string command;
@@ -266,7 +293,7 @@ int	Server::msg_parse(std::string buf, int index)
 		}
 		else if (command == "JOIN")
 		{
-			join(&_users[index], temp_vector = getNextVector(line, &tmp_i));
+			join(&_users[index], temp_vector = getNextVectorcomma(line, &tmp_i)); 
 		}
 		else if (command == "PING")
 		{
@@ -274,7 +301,7 @@ int	Server::msg_parse(std::string buf, int index)
 		}
 		else if (command == "PART")
 		{
-			temp_vector = getNextVector(line, &tmp_i);
+			temp_vector = getNextVectorcomma(line, &tmp_i);
 			std::string part_msg = getNextWord(line, &tmp_i);
 			part(&_users[index], temp_vector, part_msg);
 		}
@@ -291,7 +318,7 @@ int	Server::msg_parse(std::string buf, int index)
 		}
 		else if (command == "LIST")
 		{
-			list(&_users[index], temp_vector = getNextVector(line, &tmp_i));
+			list(&_users[index], temp_vector = getNextVectorcomma(line, &tmp_i));
 		}
 		else if (command == "KICK") // :
 		{
@@ -302,15 +329,15 @@ int	Server::msg_parse(std::string buf, int index)
 		}
 		else if (command == "PRIVMSG") // :
 		{
-			temp_vector = getNextVector(line, &tmp_i);
+			temp_vector = getNextVectorcomma(line, &tmp_i);
 			std::string priv_msg = getNextWord(line, &tmp_i);
 			privmsg(&_users[index], temp_vector, priv_msg);
 		}
 		else if (command == "NOTICE")
 		{
-			std::string n_recipient = getNextWord(line, &tmp_i);
+			temp_vector = getNextVectorcomma(line, &tmp_i);
 			std::string n_msg = getNextWord(line, &tmp_i);
-			notice(&_users[index], n_recipient, n_msg);
+			notice(&_users[index], temp_vector, n_msg);
 		}
 		i = i + 2;
 		line.erase();

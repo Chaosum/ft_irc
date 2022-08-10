@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/10 17:21:37 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 17:41:08 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <limits>
 #include <cstdlib>
 #include <ctime>
+#include <fcntl.h>
 #include "Channel.hpp"
 #include "User.hpp"
 
@@ -67,7 +68,7 @@ private:
 	User *			_getUser(string nick);
 	const User *	_getUser(string nick) const;
 	void			_changeNicksInChan(string oldNick, string newNick);
-	void			_botMsg(User * user) const;
+	void			_botMsg(User * user, string msg) const;
 	// Server commands
 	void			pass(User * user, string password);
 	void			nick(User * user, string nickname);
@@ -80,7 +81,7 @@ private:
 	void			list(User * user, vector<string> & channels);
 	void			kick(User * user, string channel, string kickee, string comment);
 	void			privmsg(User * user, vector<string> & recipients, string msg);
-	void			notice(User * user, vector<string> recipients, string msg);
+	void			notice(User * user, vector<string> &recipients, string msg);
 	void			unknownCommand(User * user, string commandName);
 	void			notLoggedIn(User * user);
 	void			pong(User * user, string message);
@@ -103,4 +104,5 @@ public:
 	string			getNextWord(string line, int *i) const;
 	int				is_command(string command);
 	vector<string>	getNextVector(string line, int *i);
+	vector<std::string>	getNextVectorcomma(string line, int *i);
 };

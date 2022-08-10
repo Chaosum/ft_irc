@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: matthieu <matthieu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:25:32 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/10 11:06:02 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 16:47:33 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ void Channel::changeNickOfUser(string oldNick, string newNick) {
 bool Channel::addUser(string nick) {
 	vector<string>::const_iterator it;
 
-	if (_maxNbOfUsers != 0 && _members.size() == _maxNbOfUsers) // On vérifie si le channel est plein
+	if (_maxNbOfUsers != 0 && _members.size() == (size_t)_maxNbOfUsers) // On vérifie si le channel est plein
 		return false;
 	for (it = _members.begin() ; it != _members.end() ; ++it)
 		if (*it == nick)

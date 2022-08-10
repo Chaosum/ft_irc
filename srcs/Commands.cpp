@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/10 17:32:55 by lgaudet-         ###   ########.fr       */
+/*   Updated: 2022/08/10 17:48:27 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,6 +284,7 @@ void Server::part(User * user, vector<string> & channels, string partMessage) {
 		return ;
 	}
 	for (it = channels.begin() ; it != channels.end() ; ++it) {
+		std::cout << *it << std::endl;
 		for (chan = _channels.begin() ; chan != _channels.end() && chan->getName() != *it ; ++chan)
 			// On parcourt les channels jusqu'à trouver le bon ou avoir atteint la fin de la liste
 			;
@@ -309,6 +310,7 @@ void Server::part(User * user, vector<string> & channels, string partMessage) {
 }
 
 void Server::_userMode(User * user, User * targetUser, vector<string> & operands) {
+	(void)targetUser;
 	if (operands.empty())
 		_sendTextToUser(NULL, user, _composeRplMessage("221", user));
 	else
@@ -356,7 +358,7 @@ void Server::_channelMode(User * user, Channel * channel, vector<string> & opera
 		_sendTextToUser(NULL, user, _composeRplMessage("472", user) + modeString[0] + " :is unknown mode char to me for " + channel->getName());
 		return ;
 	}
-	for (int i = 1 ; i < modeString.size() ; ++i) {
+	for (size_t i = 1 ; i < modeString.size() ; ++i) {
 		if (modeString[i] == 'o') {
 			if (currOp->empty()) {
 				_sendTextToUser(NULL, user, _composeRplMessage("461", user) + "MODE :Not enough parameters");
@@ -575,10 +577,10 @@ void Server::notice(User * user, vector<string> & recipients, string msg) {
 			for (chan = _channels.begin() ; chan != _channels.end() ; ++chan)
 				if (chan->getName() == *it)
 					break;
-			_sendTextToChan(user, *chan, _composePrefix(user) + "NOTICE " + recipient + " :" + msg);
+			_sendTextToChan(user, *chan, _composePrefix(user) + "NOTICE " + *it + " :" + msg);
 		}
 		else if (*it == "jeanMichel")
-			_botMsg(user);
+			_botMsg(user, msg);
 		else
 			for (user_it = _users.begin() ; user_it != _users.end() ; ++it) {
 				if (user_it->getNick() == *it) {

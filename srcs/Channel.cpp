@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/28 11:25:32 by matthieu          #+#    #+#             */
-/*   Updated: 2022/08/10 16:47:33 by mservage         ###   ########.fr       */
+/*   Updated: 2022/08/11 14:07:13 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,11 @@ bool Channel::deleteUserFromChannel(string nick) {
 	if (it == _members.end())
 		return false;
 	_members.erase(it);
+	for (it = _chanOps.begin() ; it != _chanOps.end() ; ++it)
+		if (*it == nick)
+			break ;
+	if (it != _chanOps.end())
+		_chanOps.erase(it);
 	return true;
 }
 

@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/11 14:11:28 by mservage         ###   ########.fr       */
+/*   Updated: 2022/08/11 14:47:24 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void Server::_sendPrivmsgToUser(User const * sender, string recipient, string te
 		_sendTextToUser(NULL, sender, _composeRplMessage("401", sender) + recipient + " :No such nick/channel");
 		return ;
 	}
-	_sendTextToUser(sender, &*it, "PRIVMSG" + recipient + " :" + text);
+	_sendTextToUser(sender, &*it, "PRIVMSG " + recipient + " :" + text);
 }
 
 void Server::_sendTextToChan(User const * sender, Channel const & chan, string text) const{
@@ -476,7 +476,7 @@ void Server::topic(User * user, string channel, string topic) {
 		_sendTextToUser(NULL, user, _composeRplMessage("482", user) + channel + " :You're not channel operator");
 }
 
-void Server::_listChannel(User const * user, Channel const & channel) {
+void Server::_listChannel(User const * user, Channel const & channel) const {
 	if (!channel.isSecret() || channel.isUserInChannel(user->getNick())) {
 		string topic = "";
 		string chanName = "priv";
@@ -488,7 +488,7 @@ void Server::_listChannel(User const * user, Channel const & channel) {
 	}
 }
 
-void Server::list(User * user, vector<string> & channels) {
+void Server::list(User * user, vector<string> & channels) const {
 	vector<string>::const_iterator it;
 	vector<Channel>::const_iterator chan;
 
@@ -547,7 +547,7 @@ void Server::_botMsg(User * user, string msg) const {
 		_send_txt(user->getPollFd(), ":jeanMichel!bot@localhost NOTICE " + user->getNick() + " :" + joke[rand() % 3]);
 }
 
-void Server::privmsg(User * user, vector<string> & recipients, string msg) {
+void Server::privmsg(User * user, vector<string> & recipients, string msg) const{
 	if (recipients.empty()) {
 		_sendTextToUser(NULL, user, _composeRplMessage("411", user) + ":No recipient given (<PRIVMSG>)");
 		return ;
@@ -556,7 +556,7 @@ void Server::privmsg(User * user, vector<string> & recipients, string msg) {
 		_sendTextToUser(NULL, user, _composeRplMessage("412", user) + ":No text to send");
 		return ;
 	}
-	vector<string>::iterator it;
+	vector<string>::const_iterator it;
 	for (it = recipients.begin() ; it != recipients.end() ; ++it) {
 		if ((*it)[0] == '#' || (*it)[0] == '&') // Case where the recipient is a channel
 			_sendPrivmsgToChan(user, *it, msg);
@@ -567,10 +567,10 @@ void Server::privmsg(User * user, vector<string> & recipients, string msg) {
 	}
 }
 
-void Server::notice(User * user, vector<string> & recipients, string msg) {
-	vector<User>::iterator user_it;
-	vector<Channel>::iterator chan;
-	vector<string>::iterator it;
+void Server::notice(User * user, vector<string> & recipients, string msg) const {
+	vector<User>::const_iterator user_it;
+	vector<Channel>::const_iterator chan;
+	vector<string>::const_iterator it;
 
 	if (recipients.empty() || msg.empty())
 		return ;
@@ -584,7 +584,7 @@ void Server::notice(User * user, vector<string> & recipients, string msg) {
 		else if (*it == "jeanMichel")
 			_botMsg(user, msg);
 		else
-			for (user_it = _users.begin() ; user_it != _users.end() ; ++it) {
+			for (user_it = _users.begin() ; user_it != _users.end() ; ++user_it) {
 				if (user_it->getNick() == *it) {
 					_sendTextToUser(user, &*user_it, "NOTICE " + *it + " :" + msg);
 					break;
@@ -593,14 +593,14 @@ void Server::notice(User * user, vector<string> & recipients, string msg) {
 	}
 }
 
-void Server::unknownCommand(User * user, string commandName) {
+void Server::unknownCommand(User * user, string commandName) const{
 	_sendTextToUser(NULL, user, _composeRplMessage("421", user) + commandName + " :Unknown command");
 }
 
-void Server::notLoggedIn(User * user) {
+void Server::notLoggedIn(User * user) const {
 	_sendTextToUser(NULL, user, _composeRplMessage("451", user) + ":You have not registered");
 }
 
-void Server::pong(User * user, string message) {
+void Server::pong(User * user, string message) const {
 	_sendTextToUser(NULL, user, "PONG :" + message);
 }

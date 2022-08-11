@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/22 18:07:17 by mservage          #+#    #+#             */
-/*   Updated: 2022/08/10 17:41:08 by mservage         ###   ########.fr       */
+/*   Updated: 2022/08/11 14:47:43 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ private:
 	bool			_isSpecialCharacter(char c) const;
 	bool			_isDigit(char c) const;
 	bool			_isValidNickname(string nick) const;
-	void			_listChannel(User const * user, Channel const & chan);
+	void			_listChannel(User const * user, Channel const & chan) const;
 	void			_userMode(User * user, User * targetUser, vector<string> & operands);
 	void			_channelMode(User * user, Channel * channel, vector<string> & operands);
 	void			_displayChannelMode(User * user, Channel * channel);
@@ -78,13 +78,13 @@ private:
 	void			part(User * user, vector<string> & channels, string partMessage);
 	void			mode(User * user, string requested_channel_or_user, vector<string> & operands);
 	void			topic(User * user, string channel, string topic);
-	void			list(User * user, vector<string> & channels);
+	void			list(User * user, vector<string> & channels) const;
 	void			kick(User * user, string channel, string kickee, string comment);
-	void			privmsg(User * user, vector<string> & recipients, string msg);
-	void			notice(User * user, vector<string> &recipients, string msg);
-	void			unknownCommand(User * user, string commandName);
-	void			notLoggedIn(User * user);
-	void			pong(User * user, string message);
+	void			privmsg(User * user, vector<string> & recipients, string msg) const;
+	void			notice(User * user, vector<string> &recipients, string msg) const;
+	void			unknownCommand(User * user, string commandName) const;
+	void			notLoggedIn(User * user) const;
+	void			pong(User * user, string message) const;
 
 public:
 	Server();

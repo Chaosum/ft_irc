@@ -6,7 +6,7 @@
 /*   By: mservage <mservage@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/07 22:01:07 by lgaudet-          #+#    #+#             */
-/*   Updated: 2022/08/10 17:48:27 by mservage         ###   ########.fr       */
+/*   Updated: 2022/08/11 14:11:28 by mservage         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,11 @@ void Server::_sendPrivmsgToUser(User const * sender, string recipient, string te
 	for (it = _users.begin() ; it != _users.end() ; ++it)
 		if (it->getNick() == recipient)
 			break; // the correct User is found
-	if (it == _users.end())
+	if (it == _users.end()) {
 		_sendTextToUser(NULL, sender, _composeRplMessage("401", sender) + recipient + " :No such nick/channel");
-	_sendTextToUser(sender, &*it, _composePrefix(sender) + "PRIVMSG" + recipient + " :" + text);
+		return ;
+	}
+	_sendTextToUser(sender, &*it, "PRIVMSG" + recipient + " :" + text);
 }
 
 void Server::_sendTextToChan(User const * sender, Channel const & chan, string text) const{
